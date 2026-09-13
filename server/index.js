@@ -149,6 +149,48 @@ app.post('/api/session/create', (req, res) => {
   res.json({ success: true, sessionId });
 });
 
+
+app.post('/api/connect', (req, res) => {
+  const { apiKey, token } = req.body;
+  const key = apiKey || token;
+  if (!key) {
+    return res.status(400).json({ success: false, error: 'Key or token required' });
+  }
+
+  // 1. Cauta dispozitiv dupa apiKey (sk-...)
+  for (const [devId, dev] of savedDevices.entries()) {
+    if (dev.apiKey === key || devId === key || dev.id === key) {
+      return res.json({
+        success: true,
+        apiKey: dev.apiKey || key,
+        tunnelUrl: dev.tunnelUrl || '',
+        localIp: dev.localIp || '',
+        name: dev.name || 'Terminal PC'
+      });
+    }
+  }
+
+  // 2. Cauta sesiune activa
+  for (const [sId, sess] of sessions.entries()) {
+    if (sess.apiKey === key || sId === key) {
+      return res.json({
+        success: true,
+        apiKey: sess.apiKey || key,
+        tunnelUrl: sess.tunnelUrl || '',
+        localIp: sess.localIp || ''
+      });
+    }
+  }
+
+  // 3. Daca e o cheie valida dar terminalul abia s-a pornit, returnam succes provizoriu
+  res.json({
+    success: true,
+    apiKey: key,
+    tunnelUrl: '',
+    localIp: ''
+  });
+});
+
 app.post('/api/session/update', (req, res) => {
   const { sessionId, apiKey, tunnelUrl, localIp, hostname, platform, userEmail } = req.body;
   const now = Date.now();
