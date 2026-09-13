@@ -706,7 +706,7 @@
       });
     }
 
-    function initAuth() {
+    async function initAuth() {
       try {
         const cfgRes = await fetch(`${API_BASE}/api/auth/config`);
         const cfgData = await cfgRes.json();
