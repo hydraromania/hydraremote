@@ -2,7 +2,7 @@ import subprocess
 
 cmds = [
     ['git', 'add', '-A'],
-    ['git', 'commit', '-m', 'Add live server setup and auto-start integration for remote.hydraromania.ro'],
+    ['git', 'commit', '-m', 'Add Google Remote Desktop style online/offline device monitoring dashboard and authentication'],
     ['git', 'push', 'origin', 'main']
 ]
 

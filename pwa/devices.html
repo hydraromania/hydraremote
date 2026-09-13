@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HydraREMOTE - Device Manager & Remote Access</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(22, 29, 47, 0.85);
+      --card-border: rgba(59, 130, 246, 0.2);
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59, 130, 246, 0.35);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --online: #10b981;
+      --online-glow: rgba(16, 185, 129, 0.4);
+      --offline: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg) 75%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      background: rgba(9, 13, 22, 0.6);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.4rem 0.8rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1050px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Device Grid */
+    .device-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .device-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .device-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 15px 30px -5px var(--accent-glow);
+    }
+
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .device-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.online {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 12px var(--online-glow);
+    }
+
+    .status-badge.online::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    .status-badge.offline {
+      background: rgba(100, 116, 139, 0.15);
+      color: #94a3b8;
+      border: 1px solid rgba(100, 116, 139, 0.3);
+    }
+
+    .status-badge.offline::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .device-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+      word-break: break-all;
+    }
+
+    .device-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .connect-btn {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .connect-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .connect-btn.disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Modal / Auth View */
+    #auth-view {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.95);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: #131b2e;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 2.5rem;
+      border-radius: 20px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #cbd5e1;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .auth-submit-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auth-submit-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .error-msg {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: rgba(22, 29, 47, 0.4);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      grid-column: 1 / -1;
+    }
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Auth Screen Modal -->
+  <div id="auth-view">
+    <div class="auth-card">
+      <div class="brand" style="justify-content: center; margin-bottom: 1rem;">
+        <span>HydraREMOTE</span>
+        <span class="brand-badge">Access</span>
+      </div>
+      <h2 class="auth-title">Autentificare Acces</h2>
+      <p class="auth-subtitle">Introdu cheia ta privată HydraREMOTE pentru a vizualiza computerele online</p>
+      
+      <form id="auth-form" onsubmit="handleAuth(event)">
+        <div class="input-group">
+          <label for="apiKey">Cheie Permanentă (API Key):</label>
+          <input type="password" id="apiKey" placeholder="sk-..." required autocomplete="current-password">
+        </div>
+        <button type="submit" class="auth-submit-btn">Intră în Dashboard</button>
+        <div id="auth-error" class="error-msg">Cheia specificată este invalidă.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard Header -->
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+      <span>HydraREMOTE</span>
+      <span class="brand-badge">Remote Desktop</span>
+    </div>
+    <div class="user-pill">
+      <span id="user-display">Dispozitive</span>
+      <button class="logout-btn" onclick="logout()">Deconectare</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <h1 class="section-title">Computere la distanță</h1>
+    <p class="section-subtitle">Starea în timp real a terminalelor și stațiilor conectate la rețeaua ta.</p>
+
+    <div class="device-grid" id="devices-container">
+      <!-- Injected via JavaScript -->
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    function getStoredKey() {
+      return localStorage.getItem('hydraremote_apiKey') || sessionStorage.getItem('apiKey');
+    }
+
+    function checkAuth() {
+      const key = getStoredKey();
+      const authView = document.getElementById('auth-view');
+      if (!key) {
+        authView.style.display = 'flex';
+      } else {
+        authView.style.display = 'none';
+        document.getElementById('user-display').textContent = 'Key: ' + key.substring(0, 6) + '...' + key.slice(-4);
+        loadDevices();
+      }
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const keyInput = document.getElementById('apiKey').value.trim();
+      if (!keyInput) return;
+
+      localStorage.setItem('hydraremote_apiKey', keyInput);
+      sessionStorage.setItem('apiKey', keyInput);
+      document.getElementById('auth-view').style.display = 'none';
+      document.getElementById('user-display').textContent = 'Key: ' + keyInput.substring(0, 6) + '...' + keyInput.slice(-4);
+      loadDevices();
+    }
+
+    function logout() {
+      localStorage.removeItem('hydraremote_apiKey');
+      sessionStorage.removeItem('apiKey');
+      window.location.reload();
+    }
+
+    function formatTimeAgo(timestamp) {
+      if (!timestamp) return 'Niciodată';
+      const seconds = Math.floor((Date.now() - timestamp) / 1000);
+      if (seconds < 15) return 'Chiar acum';
+      if (seconds < 60) return `acum ${seconds} secunde`;
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `acum ${minutes} minute`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `acum ${hours} ore`;
+      const days = Math.floor(hours / 24);
+      return `acum ${days} zile`;
+    }
+
+    async function loadDevices() {
+      const key = getStoredKey();
+      if (!key) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/devices?apiKey=${encodeURIComponent(key)}`);
+        const data = await res.json();
+        renderDevices(data.devices || []);
+      } catch (err) {
+        console.error('Eroare la încărcarea dispozitivelor:', err);
+      }
+    }
+
+    function renderDevices(devices) {
+      const container = document.getElementById('devices-container');
+      if (devices.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">💻</div>
+            <h3>Niciun computer detectat încă</h3>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">
+              Pornește agentul pe PC-ul tău cu comanda <code>hydraremote start</code> pentru a apărea aici.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = devices.map(d => {
+        const isOnline = d.isOnline;
+        const icon = d.platform === 'win32' ? '🪟' : (d.platform === 'darwin' ? '🍎' : '🐧');
+        const connectUrl = `/login?autoConnect=1&session=${encodeURIComponent(d.sessionId)}&key=${encodeURIComponent(d.apiKey)}`;
+
+        return `
+          <div class="device-card">
+            <div>
+              <div class="device-header">
+                <div class="device-icon">${icon}</div>
+                <div class="status-badge ${isOnline ? 'online' : 'offline'}">
+                  ${isOnline ? 'Online' : 'Offline'}
+                </div>
+              </div>
+              <div class="device-name">${d.name}</div>
+              <div class="device-meta">
+                <div><span>Sistem:</span> <strong>${d.platform || 'Necunoscut'}</strong></div>
+                <div><span>Local IP:</span> <code>${d.localIp || '-'}</code></div>
+                <div><span>Ultima activitate:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
+              </div>
+            </div>
+
+            <div>
+              ${isOnline ? `
+                <a href="${connectUrl}" class="connect-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  Conectare la Terminal
+                </a>
+              ` : `
+                <button class="connect-btn disabled" disabled>
+                  Computer Offline
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Inițializare & Polling periodic la fiecare 4 secunde pentru statut live
+    checkAuth();
+    setInterval(loadDevices, 4000);
+  </script>
+</body>
+</html>
