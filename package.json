@@ -1,0 +1,22 @@
+{
+  "name": "hydraremote",
+  "version": "2.5.8",
+  "description": "HydraREMOTE - Remote terminal and desktop access via remote.hydraromania.ro",
+  "bin": {
+    "hydraremote": "./cli/dist/cli.cjs"
+  },
+  "scripts": {
+    "start:server": "node server/index.js",
+    "cli": "node cli/dist/cli.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hydraromania/hydraremote.git"
+  },
+  "author": "HydraROMANIA",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
