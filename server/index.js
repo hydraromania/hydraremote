@@ -194,6 +194,72 @@ app.post('/api/session/update', (req, res) => {
 });
 
 // Endpoint Monitorizare Dispozitive (strict verificat pe Google Auth token sau cheie permanenta criptata)
+
+// Asociaza un PC dupa cheia sa secreta (sk-...) direct la contul utilizatorului autentificat
+app.post('/api/devices/claim', async (req, res) => {
+  const { apiKey, googleToken, customName } = req.body;
+  if (!apiKey) {
+    return res.status(400).json({ error: 'Missing apiKey' });
+  }
+
+  let userEmail = null;
+  if (googleToken) {
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: googleToken,
+        audience: GOOGLE_CLIENT_ID || undefined
+      });
+      userEmail = ticket.getPayload().email.toLowerCase();
+    } catch (err) {
+      return res.status(401).json({ error: 'Token Google invalid sau expirat' });
+    }
+  }
+
+  if (!userEmail) {
+    return res.status(401).json({ error: 'Trebuie sa fii autentificat cu Google pentru a adauga un PC' });
+  }
+
+  const cleanKey = apiKey.trim();
+  const now = Date.now();
+  
+  // Cautam daca dispozitivul exista deja in baza de date
+  let dev = savedDevices.get(cleanKey);
+  if (!dev) {
+    for (const [id, item] of savedDevices.entries()) {
+      if (item.apiKey === cleanKey) {
+        dev = item;
+        break;
+      }
+    }
+  }
+
+  if (dev) {
+    dev.userEmail = userEmail;
+    if (customName && customName.trim()) dev.name = customName.trim();
+    savedDevices.set(dev.id, dev);
+  } else {
+    // Creem inregistrarea PC-ului chiar daca nu a trimis inca heartbeat
+    const devId = cleanKey;
+    dev = {
+      id: devId,
+      sessionId: crypto.randomUUID(),
+      apiKey: cleanKey,
+      userEmail: userEmail,
+      name: (customName && customName.trim()) || 'PC Adaugat Manual',
+      platform: 'unknown',
+      tunnelUrl: '',
+      localIp: '',
+      lastSeen: 0,
+      createdAt: now
+    };
+    savedDevices.set(devId, dev);
+  }
+
+  persistDevices();
+  console.log();
+  res.json({ success: true, device: dev });
+});
+
 app.get('/api/devices', async (req, res) => {
   const { apiKey, googleToken } = req.query;
   const now = Date.now();
