@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const cors = require('cors');
+const { OAuth2Client } = require('google-auth-library');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,6 +12,18 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 4420;
 const PWA_DIR = path.join(__dirname, '..', 'pwa');
 const DATA_FILE = path.join(__dirname, 'devices_db.json');
+const CONFIG_FILE = path.join(__dirname, 'oauth_config.json');
+
+// Client ID Google configurabil
+let GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+try {
+  if (fs.existsSync(CONFIG_FILE)) {
+    const cfg = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    if (cfg.googleClientId) GOOGLE_CLIENT_ID = cfg.googleClientId;
+  }
+} catch (e) {}
+
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 app.use(cors());
 app.use(express.json());
@@ -30,7 +43,7 @@ try {
     }
   }
 } catch (e) {
-  console.error('[HydraREMOTE] Eroare la citirea bazei de date a dispozitivelor:', e.message);
+  console.error('[HydraREMOTE] Eroare la citirea bazei de date:', e.message);
 }
 
 function persistDevices() {
@@ -51,6 +64,57 @@ setInterval(() => {
     }
   }
 }, 60000);
+
+// Endpoint verificare token Google (OAuth ID Token)
+app.post('/api/auth/google', async (req, res) => {
+  const { credential, clientId } = req.body;
+  if (!credential) {
+    return res.status(400).json({ error: 'Missing credential token' });
+  }
+
+  try {
+    const activeClientId = clientId || GOOGLE_CLIENT_ID;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: activeClientId || undefined
+    });
+    const payload = ticket.getPayload();
+    const email = payload.email.toLowerCase();
+
+    // Dacă a fost trimis un Client ID valid și nu îl aveam salvat
+    if (clientId && clientId !== GOOGLE_CLIENT_ID) {
+      GOOGLE_CLIENT_ID = clientId;
+      fs.writeFileSync(CONFIG_FILE, JSON.stringify({ googleClientId: clientId }, null, 2));
+    }
+
+    res.json({
+      success: true,
+      email,
+      name: payload.name,
+      picture: payload.picture
+    });
+  } catch (err) {
+    console.error('[OAuth] Token validation failed:', err.message);
+    res.status(401).json({ error: 'Invalid Google token: ' + err.message });
+  }
+});
+
+// Endpoint pentru setare / citire Google Client ID
+app.get('/api/auth/config', (req, res) => {
+  res.json({
+    googleClientId: GOOGLE_CLIENT_ID || ''
+  });
+});
+
+app.post('/api/auth/config', (req, res) => {
+  const { googleClientId } = req.body;
+  if (googleClientId) {
+    GOOGLE_CLIENT_ID = googleClientId.trim();
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify({ googleClientId: GOOGLE_CLIENT_ID }, null, 2));
+    return res.json({ success: true, googleClientId: GOOGLE_CLIENT_ID });
+  }
+  res.status(400).json({ error: 'Missing googleClientId' });
+});
 
 // Endpoint-uri API sesiune & Heartbeat de la terminale
 app.post('/api/session/create', (req, res) => {
@@ -129,20 +193,38 @@ app.post('/api/session/update', (req, res) => {
   res.json({ success: true });
 });
 
-// Endpoint Monitorizare Dispozitive (filtrat pe cont Google sau cheie permanentă)
-app.get('/api/devices', (req, res) => {
-  const { apiKey, email } = req.query;
+// Endpoint Monitorizare Dispozitive (strict verificat pe Google Auth token sau cheie permanenta criptata)
+app.get('/api/devices', async (req, res) => {
+  const { apiKey, googleToken } = req.query;
   const now = Date.now();
-  const ONLINE_THRESHOLD_MS = 45 * 1000; // 45 secunde prag online
+  const ONLINE_THRESHOLD_MS = 45 * 1000;
+
+  let authenticatedEmail = null;
+
+  // Verificare token Google criptografic
+  if (googleToken) {
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: googleToken,
+        audience: GOOGLE_CLIENT_ID || undefined
+      });
+      authenticatedEmail = ticket.getPayload().email.toLowerCase();
+    } catch (e) {
+      return res.status(401).json({ error: 'Token Google invalid sau expirat. Te rugam sa te reautentifici.' });
+    }
+  }
+
+  // Fără token Google valid și fără apiKey valid -> Acces interzis
+  if (!authenticatedEmail && !apiKey) {
+    return res.status(401).json({ error: 'Neautorizat. Autentifica-te cu Google sau furnizeaza token-ul dispozitivului.' });
+  }
 
   let list = Array.from(savedDevices.values());
 
-  // Dacă este specificat contul de email (Google)
-  if (email) {
-    const filterEmail = email.trim().toLowerCase();
-    list = list.filter(d => d.userEmail && d.userEmail === filterEmail);
+  if (authenticatedEmail) {
+    list = list.filter(d => d.userEmail && d.userEmail === authenticatedEmail);
   } else if (apiKey) {
-    list = list.filter(d => !d.apiKey || d.apiKey === apiKey || d.apiKey.startsWith(apiKey.substring(0, 10)));
+    list = list.filter(d => d.apiKey === apiKey);
   }
 
   const result = list.map(d => ({
@@ -159,25 +241,6 @@ app.get('/api/devices', (req, res) => {
   }));
 
   res.json({ success: true, devices: result });
-});
-
-// Asociază un dispozitiv cu un cont Google din interfață
-app.post('/api/devices/claim', (req, res) => {
-  const { deviceId, email } = req.body;
-  if (!deviceId || !email) {
-    return res.status(400).json({ error: 'Missing deviceId or email' });
-  }
-
-  const cleanEmail = email.trim().toLowerCase();
-  if (savedDevices.has(deviceId)) {
-    const dev = savedDevices.get(deviceId);
-    dev.userEmail = cleanEmail;
-    savedDevices.set(deviceId, dev);
-    persistDevices();
-    return res.json({ success: true, device: dev });
-  }
-
-  res.status(404).json({ error: 'Device not found' });
 });
 
 // Endpoint-uri temp-key (QR Scan și conectare rapidă PWA)

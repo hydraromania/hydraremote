@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HydraREMOTE - Device Manager & Google Account</title>
+  <title>HydraREMOTE - Device Manager & Secure Access</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
@@ -308,10 +308,9 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.96);
+      background: rgba(9, 13, 22, 0.97);
       backdrop-filter: blur(16px);
       z-index: 100;
-      display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
@@ -341,11 +340,11 @@
       line-height: 1.4;
     }
 
-    .google-btn-container {
+    .google-btn-slot {
       display: flex;
       justify-content: center;
-      margin-bottom: 1.5rem;
-      min-height: 44px;
+      margin-bottom: 1rem;
+      min-height: 46px;
     }
 
     .divider {
@@ -354,7 +353,7 @@
       text-align: center;
       color: var(--text-muted);
       font-size: 0.75rem;
-      margin: 1.25rem 0;
+      margin: 1.5rem 0;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
@@ -415,6 +414,17 @@
       box-shadow: 0 4px 15px var(--accent-glow);
     }
 
+    .error-box {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
     /* Modal Tutorial */
     #tutorial-modal {
       display: none;
@@ -431,7 +441,7 @@
       border: 1px solid var(--card-border);
       padding: 2rem;
       border-radius: 16px;
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
     }
     .tutorial-box pre {
@@ -461,39 +471,44 @@
 </head>
 <body>
 
-  <!-- Auth Screen Modal -->
+  <!-- Auth Screen Modal (Doar Google OAuth sau Token Dispozitiv) -->
   <div id="auth-view">
     <div class="auth-card">
       <div class="brand" style="justify-content: center; margin-bottom: 1rem;">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
         <span>HydraREMOTE</span>
-        <span class="brand-badge">Google Access</span>
+        <span class="brand-badge">Google Auth</span>
       </div>
-      <h2 class="auth-title">Autentificare Cont</h2>
-      <p class="auth-subtitle">Conectează-te cu contul tău Google pentru a vedea automat toate PC-urile și terminalele tale sincronizate.</p>
+      <h2 class="auth-title">Autentificare Securizată</h2>
+      <p class="auth-subtitle">Selectează contul tău Google pentru a încărca exclusiv terminalele și calculatoarele asociate ție.</p>
       
       <!-- Google Sign-In button container -->
-      <div class="google-btn-container" id="google-btn-slot">
-        <!-- Rendered by Google GSI if Client ID exists -->
+      <div class="google-btn-slot" id="google-btn-slot"></div>
+
+      <!-- Configurare facilă a Client ID dacă nu a fost încă setat -->
+      <div id="oauth-setup-box" style="display: none; margin-bottom: 1rem;">
+        <p style="font-size: 0.8rem; color: #fbbf24; margin-bottom: 0.5rem;">
+          ⚙️ Introdu Google OAuth Client ID pentru domeniul tău:
+        </p>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="customClientId" placeholder="apps.googleusercontent.com" style="flex:1; padding: 0.5rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; font-size: 0.8rem;">
+          <button onclick="saveClientId()" style="padding: 0.5rem 0.8rem; background: var(--accent); border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer;">Salvare</button>
+        </div>
       </div>
 
-      <!-- Quick Email / Google Auth -->
-      <form id="google-direct-form" onsubmit="handleDirectLogin(event)">
+      <div class="divider"><span>sau conectare cu token direct</span></div>
+
+      <!-- Conectare exclusiv cu token-ul criptat de sesiune/terminal -->
+      <form id="key-form" onsubmit="handleTokenLogin(event)">
         <div class="input-group">
-          <label for="userEmail">Adresă Cont Google (Gmail / Workspace):</label>
-          <input type="email" id="userEmail" placeholder="exemplu@gmail.com" required autocomplete="username">
+          <input type="password" id="tokenInput" placeholder="Cheie/Token Terminal (ex: sk-75c...)" required autocomplete="current-password">
         </div>
-        <button type="submit" class="auth-submit-btn">Conectează-te cu acest cont</button>
+        <button type="submit" class="auth-submit-btn" style="background: rgba(255,255,255,0.08); color: #cbd5e1;">
+          Conectare cu Token
+        </button>
       </form>
 
-      <div class="divider"><span>sau cu cheie permanentă</span></div>
-
-      <form id="key-form" onsubmit="handleKeyLogin(event)">
-        <div class="input-group" style="margin-bottom: 0.75rem;">
-          <input type="password" id="apiKeyInput" placeholder="Cheie permanentă (sk-...)" autocomplete="current-password">
-        </div>
-        <button type="submit" class="auth-submit-btn" style="background: rgba(255,255,255,0.1); color: #cbd5e1;">Autentificare cu cheie</button>
-      </form>
+      <div id="auth-error-box" class="error-box"></div>
     </div>
   </div>
 
@@ -502,11 +517,11 @@
     <div class="tutorial-box">
       <h3 style="margin-bottom: 0.5rem;">Cum asociezi un PC nou?</h3>
       <p style="font-size: 0.85rem; color: var(--text-muted);">
-        Pe calculatorul pe care dorești să îl accesezi la distanță, deschide un terminal și rulează comanda de login cu același cont:
+        Pe calculatorul pe care dorești să îl accesezi, deschide terminalul și sincronizează-l cu contul tău:
       </p>
       <pre id="cli-cmd-example">hydraremote login emailul_tau@gmail.com</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-        După rulare, computerul va apărea automat în lista de mai jos pe telefon sau orice alt dispozitiv conectat!
+        Sau dacă preferi conexiunea directă prin token, folosește cheia generată de <code>hydraremote key</code>.
       </p>
       <button class="auth-submit-btn" onclick="closeTutorial()">Am înțeles</button>
     </div>
@@ -531,7 +546,7 @@
     <div class="top-bar">
       <div>
         <h1 class="section-title">Computere la distanță</h1>
-        <p class="section-subtitle">Terminalele conectate la contul tău. Accesează-le instant de pe mobil sau alt PC.</p>
+        <p class="section-subtitle">Terminalele conectate la contul tău Google. Accesează-le instant de pe mobil sau alt PC.</p>
       </div>
       <button class="add-device-btn" onclick="openTutorial()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -546,99 +561,147 @@
 
   <script>
     const API_BASE = window.location.origin;
+    let activeGoogleClientId = '';
 
     function getAuth() {
-      const email = localStorage.getItem('hydra_user_email');
-      const key = localStorage.getItem('hydraremote_apiKey');
-      return { email, key };
+      const googleToken = localStorage.getItem('hydra_google_token');
+      const googleEmail = localStorage.getItem('hydra_google_email');
+      const apiKey = localStorage.getItem('hydra_device_token');
+      return { googleToken, googleEmail, apiKey };
     }
 
-    function checkAuth() {
-      const { email, key } = getAuth();
+    async function initAuth() {
+      // 1. Află Client ID-ul Google de la server
+      try {
+        const cfgRes = await fetch(`${API_BASE}/api/auth/config`);
+        const cfgData = await cfgRes.json();
+        activeGoogleClientId = cfgData.googleClientId || localStorage.getItem('hydra_custom_client_id') || '';
+      } catch (e) {}
+
+      const { googleToken, googleEmail, apiKey } = getAuth();
       const authView = document.getElementById('auth-view');
-      
-      if (!email && !key) {
+
+      if (!googleToken && !apiKey) {
         authView.style.display = 'flex';
-        initGoogleGSI();
+        renderGoogleButton();
       } else {
         authView.style.display = 'none';
-        const display = email || (key ? 'Key: ' + key.substring(0, 6) + '...' : 'Utilizator');
+        const display = googleEmail || (apiKey ? 'Token: ' + apiKey.substring(0, 6) + '...' : 'Autentificat');
         document.getElementById('user-display').textContent = display;
-        if (email) {
-          document.getElementById('user-avatar').textContent = email.charAt(0).toUpperCase();
+        if (googleEmail) {
+          document.getElementById('user-avatar').textContent = googleEmail.charAt(0).toUpperCase();
         }
         loadDevices();
       }
     }
 
-    function parseJwt(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(escape(window.atob(base64))));
-      } catch (e) {
-        return null;
-      }
-    }
+    function renderGoogleButton() {
+      const slot = document.getElementById('google-btn-slot');
+      const setupBox = document.getElementById('oauth-setup-box');
 
-    function handleCredentialResponse(response) {
-      const user = parseJwt(response.credential);
-      if (user && user.email) {
-        localStorage.setItem('hydra_user_email', user.email.toLowerCase());
-        if (user.picture) localStorage.setItem('hydra_user_picture', user.picture);
-        document.getElementById('auth-view').style.display = 'none';
-        checkAuth();
+      if (!activeGoogleClientId) {
+        setupBox.style.display = 'block';
+        slot.innerHTML = `<p style="font-size: 0.85rem; color: #94a3b8; padding: 6px;">Configurează Google OAuth Client ID mai jos pentru a activa butonul de conectare cu Google.</p>`;
+        return;
       }
-    }
 
-    function initGoogleGSI() {
-      // Dacă există un Google Client ID configurat sau instanțiat
+      setupBox.style.display = 'none';
       if (window.google && window.google.accounts) {
         try {
           google.accounts.id.initialize({
-            client_id: "718538204981-mock.apps.googleusercontent.com", // Înlocuibil cu Google Console OAuth Client ID real
-            callback: handleCredentialResponse,
+            client_id: activeGoogleClientId,
+            callback: handleGoogleCallback,
+            prompt_parent_id: 'google-btn-slot',
             auto_select: false
           });
-          google.accounts.id.renderButton(
-            document.getElementById("google-btn-slot"),
-            { theme: "outline", size: "large", width: 320, text: "signin_with" }
-          );
-        } catch (e) {}
+          google.accounts.id.renderButton(slot, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'signin_with',
+            shape: 'rectangular',
+            width: 320
+          });
+        } catch (err) {
+          console.error('Google button init error:', err);
+        }
+      } else {
+        setTimeout(renderGoogleButton, 500);
       }
     }
 
-    function handleDirectLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('userEmail').value.trim().toLowerCase();
-      if (!email) return;
-
-      localStorage.setItem('hydra_user_email', email);
-      document.getElementById('auth-view').style.display = 'none';
-      checkAuth();
+    async function saveClientId() {
+      const id = document.getElementById('customClientId').value.trim();
+      if (!id) return;
+      activeGoogleClientId = id;
+      localStorage.setItem('hydra_custom_client_id', id);
+      try {
+        await fetch(`${API_BASE}/api/auth/config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ googleClientId: id })
+        });
+      } catch (e) {}
+      renderGoogleButton();
     }
 
-    function handleKeyLogin(e) {
-      e.preventDefault();
-      const key = document.getElementById('apiKeyInput').value.trim();
-      if (!key) return;
+    async function handleGoogleCallback(response) {
+      const idToken = response.credential;
+      const errBox = document.getElementById('auth-error-box');
+      errBox.style.display = 'none';
 
-      localStorage.setItem('hydraremote_apiKey', key);
+      try {
+        // Validare pe server cu Google
+        const res = await fetch(`${API_BASE}/api/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: idToken, clientId: activeGoogleClientId })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          localStorage.setItem('hydra_google_token', idToken);
+          localStorage.setItem('hydra_google_email', data.email);
+          localStorage.removeItem('hydra_device_token');
+          document.getElementById('auth-view').style.display = 'none';
+          initAuth();
+        } else {
+          showError(data.error || 'Autentificare eșuată cu Google');
+        }
+      } catch (e) {
+        showError('Eroare de rețea la validarea contului Google.');
+      }
+    }
+
+    function handleTokenLogin(e) {
+      e.preventDefault();
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) return;
+
+      localStorage.setItem('hydra_device_token', token);
+      localStorage.removeItem('hydra_google_token');
+      localStorage.removeItem('hydra_google_email');
       document.getElementById('auth-view').style.display = 'none';
-      checkAuth();
+      initAuth();
+    }
+
+    function showError(msg) {
+      const errBox = document.getElementById('auth-error-box');
+      errBox.textContent = msg;
+      errBox.style.display = 'block';
     }
 
     function logout() {
-      localStorage.removeItem('hydra_user_email');
-      localStorage.removeItem('hydraremote_apiKey');
-      localStorage.removeItem('hydra_user_picture');
+      localStorage.removeItem('hydra_google_token');
+      localStorage.removeItem('hydra_google_email');
+      localStorage.removeItem('hydra_device_token');
       sessionStorage.clear();
       window.location.reload();
     }
 
     function openTutorial() {
-      const { email } = getAuth();
-      const example = email ? `hydraremote login ${email}` : `hydraremote login emailul_tau@gmail.com`;
+      const { googleEmail } = getAuth();
+      const example = googleEmail ? `hydraremote login ${googleEmail}` : `hydraremote login emailul_tau@gmail.com`;
       document.getElementById('cli-cmd-example').textContent = example;
       document.getElementById('tutorial-modal').style.display = 'flex';
     }
@@ -661,15 +724,19 @@
     }
 
     async function loadDevices() {
-      const { email, key } = getAuth();
-      if (!email && !key) return;
+      const { googleToken, apiKey } = getAuth();
+      if (!googleToken && !apiKey) return;
 
       let url = `${API_BASE}/api/devices?`;
-      if (email) url += `email=${encodeURIComponent(email)}`;
-      else if (key) url += `apiKey=${encodeURIComponent(key)}`;
+      if (googleToken) url += `googleToken=${encodeURIComponent(googleToken)}`;
+      else if (apiKey) url += `apiKey=${encodeURIComponent(apiKey)}`;
 
       try {
         const res = await fetch(url);
+        if (res.status === 401) {
+          logout();
+          return;
+        }
         const data = await res.json();
         renderDevices(data.devices || []);
       } catch (err) {
@@ -680,15 +747,15 @@
     function renderDevices(devices) {
       const container = document.getElementById('devices-container');
       if (devices.length === 0) {
-        const { email } = getAuth();
+        const { googleEmail } = getAuth();
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">💻</div>
-            <h3>Niciun computer asociat contului ${email || ''}</h3>
+            <h3>Niciun computer sincronizat încă</h3>
             <p style="color: var(--text-muted); margin-top: 0.6rem; max-width: 480px; margin-left: auto; margin-right: auto;">
-              Pentru a adăuga un PC, deschide un terminal pe acel PC și rulează comanda:<br>
+              Pe calculatorul pe care vrei să îl vezi aici, rulează comanda:<br>
               <code style="background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px; color: #38bdf8; display: inline-block; margin-top: 8px;">
-                hydraremote login ${email || 'emailul_tau@gmail.com'}
+                hydraremote login ${googleEmail || 'emailul_tau@gmail.com'}
               </code>
             </p>
           </div>
@@ -715,7 +782,7 @@
                 <div><span>Sistem:</span> <strong>${d.platform || 'Necunoscut'}</strong></div>
                 <div><span>Local IP:</span> <code>${d.localIp || '-'}</code></div>
                 <div><span>Ultima activitate:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
-                ${d.userEmail ? `<div><span>Asociat:</span> <span style="color:#60a5fa;">${d.userEmail}</span></div>` : ''}
+                ${d.userEmail ? `<div><span>Cont asociat:</span> <span style="color:#60a5fa;">${d.userEmail}</span></div>` : ''}
               </div>
             </div>
 
@@ -737,7 +804,7 @@
     }
 
     // Inițializare & Polling
-    checkAuth();
+    initAuth();
     setInterval(loadDevices, 4000);
   </script>
 </body>

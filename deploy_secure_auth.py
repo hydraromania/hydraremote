@@ -1,6 +1,5 @@
 import paramiko, time, subprocess
 
-# 1. Upload files
 c = paramiko.SSHClient()
 c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 c.connect('vmi1000.hydraromania.ro', username='hydra', password='MagicMedia1987+', timeout=15)
@@ -11,7 +10,6 @@ sftp.close()
 c.close()
 print("SFTP Upload completed.")
 
-# 2. Restart service via administrator -> su - root
 c_admin = paramiko.SSHClient()
 c_admin.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 c_admin.connect('vmi1000.hydraromania.ro', username='administrator', password='MagicMedia1987+', timeout=15)
@@ -39,10 +37,9 @@ out = wait_tok('#', timeout=10)
 print("Restart output:", out.strip())
 c_admin.close()
 
-# 3. Git commit & push
 cmds = [
     ['git', 'add', '-A'],
-    ['git', 'commit', '-m', 'Add Google account authentication and per-account device syncing'],
+    ['git', 'commit', '-m', 'Enforce secure Google OAuth token validation and remove unprotected email login'],
     ['git', 'push', 'origin', 'main']
 ]
 for cmd in cmds:
