@@ -360,7 +360,65 @@
       min-height: 46px;
     }
 
-    .divider {
+    
+    /* CLI Quick Install snippet */
+    .cli-install-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin: 1.25rem 0 1.5rem 0;
+      text-align: left;
+      position: relative;
+    }
+    .cli-install-box .cli-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .cli-install-box .cli-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cli-install-box .cli-copy-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .cli-install-box .cli-copy-btn:hover {
+      background: rgba(56, 189, 248, 0.25);
+      color: #fff;
+    }
+    .cli-install-box code {
+      display: block;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.82rem;
+      color: #f1f5f9;
+      background: #090d16;
+      padding: 0.6rem 0.75rem;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: all;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+.divider {
       display: flex;
       align-items: center;
       text-align: center;
@@ -509,6 +567,21 @@
       <h2 class="auth-title">Autentificare Securizată</h2>
       <p class="auth-subtitle">Selectează contul tău Google pentru a încărca exclusiv terminalele și calculatoarele asociate ție.</p>
       
+      <!-- Comanda instalare CLI -->
+      <div class="cli-install-box">
+        <div class="cli-header">
+          <span class="cli-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+            Instalare pe PC / Server
+          </span>
+          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'npm install -g hydraremote')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            Copiază
+          </button>
+        </div>
+        <code>npm install -g hydraremote</code>
+      </div>
+
       <!-- Google Sign-In button container -->
       <div class="google-btn-slot" id="google-btn-slot"></div>
 
@@ -560,9 +633,13 @@
     <div class="modal-box">
       <h3 style="margin-bottom: 0.5rem;">Cum afli cheia PC-ului?</h3>
       <p style="font-size: 0.85rem; color: var(--text-muted);">
-        Pe calculatorul pe care dorești să îl adaugi, deschide un terminal și tastează:
+        1. Pe calculatorul pe care dorești accesul la distanță, instalează HydraREMOTE:
       </p>
-      <pre>hydraremote key</pre>
+      <pre style="margin-top: 0.5rem;">npm install -g hydraremote</pre>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+        2. Generează cheia secretă a PC-ului:
+      </p>
+      <pre style="margin-top: 0.5rem;">hydraremote key</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
         Copiază cheia secretă afișată (începe cu <code>sk-</code>) și introdu-o în fereastra <b>„+ Adaugă PC cu Cheie SK”</b>.
       </p>
@@ -619,7 +696,17 @@
       return { googleToken, googleEmail, apiKey };
     }
 
-    async function initAuth() {
+    async function copyCliCommand(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copiat!';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      }).catch(err => {
+        alert('Comandă: ' + text);
+      });
+    }
+
+    function initAuth() {
       try {
         const cfgRes = await fetch(`${API_BASE}/api/auth/config`);
         const cfgData = await cfgRes.json();
