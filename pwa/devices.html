@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HydraREMOTE - Device Manager & Remote Access</title>
+  <title>HydraREMOTE - Device Manager & Google Account</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
       --bg: #090d16;
@@ -36,7 +37,7 @@
     }
 
     header {
-      padding: 1.25rem 2rem;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -74,10 +75,29 @@
       align-items: center;
       gap: 0.75rem;
       background: rgba(255, 255, 255, 0.05);
-      padding: 0.4rem 0.8rem;
+      padding: 0.35rem 0.85rem;
       border-radius: 9999px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       font-size: 0.85rem;
+    }
+
+    .user-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.75rem;
+      overflow: hidden;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .logout-btn {
@@ -96,28 +116,55 @@
 
     main {
       flex: 1;
-      max-width: 1050px;
+      max-width: 1100px;
       width: 100%;
       margin: 0 auto;
       padding: 2.5rem 1.5rem;
     }
 
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
     .section-title {
       font-size: 1.5rem;
       font-weight: 700;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.35rem;
     }
 
     .section-subtitle {
       color: var(--text-muted);
       font-size: 0.9rem;
-      margin-bottom: 2rem;
+    }
+
+    .add-device-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid var(--card-border);
+      color: #93c5fd;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .add-device-btn:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #fff;
     }
 
     /* Device Grid */
     .device-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 1.5rem;
     }
 
@@ -133,7 +180,6 @@
       justify-content: space-between;
       transition: all 0.2s ease;
       position: relative;
-      overflow: hidden;
     }
 
     .device-card:hover {
@@ -211,7 +257,7 @@
     }
 
     .device-name {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: #fff;
       margin-bottom: 0.35rem;
@@ -224,7 +270,7 @@
       margin-bottom: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
 
     .connect-btn {
@@ -262,7 +308,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.95);
+      background: rgba(9, 13, 22, 0.96);
       backdrop-filter: blur(16px);
       z-index: 100;
       display: flex;
@@ -276,7 +322,7 @@
       border: 1px solid rgba(59, 130, 246, 0.3);
       padding: 2.5rem;
       border-radius: 20px;
-      max-width: 420px;
+      max-width: 440px;
       width: 100%;
       box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
       text-align: center;
@@ -291,25 +337,52 @@
     .auth-subtitle {
       font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
+      line-height: 1.4;
+    }
+
+    .google-btn-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      min-height: 44px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin: 1.25rem 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .divider span {
+      padding: 0 10px;
     }
 
     .input-group {
       text-align: left;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .input-group label {
       display: block;
       font-size: 0.8rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       color: #cbd5e1;
     }
 
     .input-group input {
       width: 100%;
-      padding: 0.85rem 1rem;
+      padding: 0.8rem 1rem;
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 10px;
@@ -326,13 +399,13 @@
 
     .auth-submit-btn {
       width: 100%;
-      padding: 0.85rem;
+      padding: 0.8rem;
       background: var(--accent);
       border: none;
       border-radius: 10px;
       color: white;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -342,11 +415,33 @@
       box-shadow: 0 4px 15px var(--accent-glow);
     }
 
-    .error-msg {
-      color: #ef4444;
-      font-size: 0.85rem;
-      margin-top: 1rem;
+    /* Modal Tutorial */
+    #tutorial-modal {
       display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 110;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .tutorial-box {
+      background: #131b2e;
+      border: 1px solid var(--card-border);
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .tutorial-box pre {
+      background: #090d16;
+      padding: 1rem;
+      border-radius: 8px;
+      color: #38bdf8;
+      font-family: monospace;
+      margin: 1rem 0;
+      overflow-x: auto;
     }
 
     /* Empty state */
@@ -370,20 +465,50 @@
   <div id="auth-view">
     <div class="auth-card">
       <div class="brand" style="justify-content: center; margin-bottom: 1rem;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
         <span>HydraREMOTE</span>
-        <span class="brand-badge">Access</span>
+        <span class="brand-badge">Google Access</span>
       </div>
-      <h2 class="auth-title">Autentificare Acces</h2>
-      <p class="auth-subtitle">Introdu cheia ta privată HydraREMOTE pentru a vizualiza computerele online</p>
+      <h2 class="auth-title">Autentificare Cont</h2>
+      <p class="auth-subtitle">Conectează-te cu contul tău Google pentru a vedea automat toate PC-urile și terminalele tale sincronizate.</p>
       
-      <form id="auth-form" onsubmit="handleAuth(event)">
+      <!-- Google Sign-In button container -->
+      <div class="google-btn-container" id="google-btn-slot">
+        <!-- Rendered by Google GSI if Client ID exists -->
+      </div>
+
+      <!-- Quick Email / Google Auth -->
+      <form id="google-direct-form" onsubmit="handleDirectLogin(event)">
         <div class="input-group">
-          <label for="apiKey">Cheie Permanentă (API Key):</label>
-          <input type="password" id="apiKey" placeholder="sk-..." required autocomplete="current-password">
+          <label for="userEmail">Adresă Cont Google (Gmail / Workspace):</label>
+          <input type="email" id="userEmail" placeholder="exemplu@gmail.com" required autocomplete="username">
         </div>
-        <button type="submit" class="auth-submit-btn">Intră în Dashboard</button>
-        <div id="auth-error" class="error-msg">Cheia specificată este invalidă.</div>
+        <button type="submit" class="auth-submit-btn">Conectează-te cu acest cont</button>
       </form>
+
+      <div class="divider"><span>sau cu cheie permanentă</span></div>
+
+      <form id="key-form" onsubmit="handleKeyLogin(event)">
+        <div class="input-group" style="margin-bottom: 0.75rem;">
+          <input type="password" id="apiKeyInput" placeholder="Cheie permanentă (sk-...)" autocomplete="current-password">
+        </div>
+        <button type="submit" class="auth-submit-btn" style="background: rgba(255,255,255,0.1); color: #cbd5e1;">Autentificare cu cheie</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tutorial Modal -->
+  <div id="tutorial-modal" onclick="if(event.target===this)closeTutorial()">
+    <div class="tutorial-box">
+      <h3 style="margin-bottom: 0.5rem;">Cum asociezi un PC nou?</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Pe calculatorul pe care dorești să îl accesezi la distanță, deschide un terminal și rulează comanda de login cu același cont:
+      </p>
+      <pre id="cli-cmd-example">hydraremote login emailul_tau@gmail.com</pre>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        După rulare, computerul va apărea automat în lista de mai jos pe telefon sau orice alt dispozitiv conectat!
+      </p>
+      <button class="auth-submit-btn" onclick="closeTutorial()">Am înțeles</button>
     </div>
   </div>
 
@@ -395,15 +520,24 @@
       <span class="brand-badge">Remote Desktop</span>
     </div>
     <div class="user-pill">
-      <span id="user-display">Dispozitive</span>
-      <button class="logout-btn" onclick="logout()">Deconectare</button>
+      <div class="user-avatar" id="user-avatar">H</div>
+      <span id="user-display">Se încarcă...</span>
+      <button class="logout-btn" onclick="logout()">Ieșire</button>
     </div>
   </header>
 
   <!-- Main Content -->
   <main>
-    <h1 class="section-title">Computere la distanță</h1>
-    <p class="section-subtitle">Starea în timp real a terminalelor și stațiilor conectate la rețeaua ta.</p>
+    <div class="top-bar">
+      <div>
+        <h1 class="section-title">Computere la distanță</h1>
+        <p class="section-subtitle">Terminalele conectate la contul tău. Accesează-le instant de pe mobil sau alt PC.</p>
+      </div>
+      <button class="add-device-btn" onclick="openTutorial()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adaugă PC / Instrucțiuni
+      </button>
+    </div>
 
     <div class="device-grid" id="devices-container">
       <!-- Injected via JavaScript -->
@@ -413,44 +547,110 @@
   <script>
     const API_BASE = window.location.origin;
 
-    function getStoredKey() {
-      return localStorage.getItem('hydraremote_apiKey') || sessionStorage.getItem('apiKey');
+    function getAuth() {
+      const email = localStorage.getItem('hydra_user_email');
+      const key = localStorage.getItem('hydraremote_apiKey');
+      return { email, key };
     }
 
     function checkAuth() {
-      const key = getStoredKey();
+      const { email, key } = getAuth();
       const authView = document.getElementById('auth-view');
-      if (!key) {
+      
+      if (!email && !key) {
         authView.style.display = 'flex';
+        initGoogleGSI();
       } else {
         authView.style.display = 'none';
-        document.getElementById('user-display').textContent = 'Key: ' + key.substring(0, 6) + '...' + key.slice(-4);
+        const display = email || (key ? 'Key: ' + key.substring(0, 6) + '...' : 'Utilizator');
+        document.getElementById('user-display').textContent = display;
+        if (email) {
+          document.getElementById('user-avatar').textContent = email.charAt(0).toUpperCase();
+        }
         loadDevices();
       }
     }
 
-    async function handleAuth(e) {
-      e.preventDefault();
-      const keyInput = document.getElementById('apiKey').value.trim();
-      if (!keyInput) return;
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(escape(window.atob(base64))));
+      } catch (e) {
+        return null;
+      }
+    }
 
-      localStorage.setItem('hydraremote_apiKey', keyInput);
-      sessionStorage.setItem('apiKey', keyInput);
+    function handleCredentialResponse(response) {
+      const user = parseJwt(response.credential);
+      if (user && user.email) {
+        localStorage.setItem('hydra_user_email', user.email.toLowerCase());
+        if (user.picture) localStorage.setItem('hydra_user_picture', user.picture);
+        document.getElementById('auth-view').style.display = 'none';
+        checkAuth();
+      }
+    }
+
+    function initGoogleGSI() {
+      // Dacă există un Google Client ID configurat sau instanțiat
+      if (window.google && window.google.accounts) {
+        try {
+          google.accounts.id.initialize({
+            client_id: "718538204981-mock.apps.googleusercontent.com", // Înlocuibil cu Google Console OAuth Client ID real
+            callback: handleCredentialResponse,
+            auto_select: false
+          });
+          google.accounts.id.renderButton(
+            document.getElementById("google-btn-slot"),
+            { theme: "outline", size: "large", width: 320, text: "signin_with" }
+          );
+        } catch (e) {}
+      }
+    }
+
+    function handleDirectLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('userEmail').value.trim().toLowerCase();
+      if (!email) return;
+
+      localStorage.setItem('hydra_user_email', email);
       document.getElementById('auth-view').style.display = 'none';
-      document.getElementById('user-display').textContent = 'Key: ' + keyInput.substring(0, 6) + '...' + keyInput.slice(-4);
-      loadDevices();
+      checkAuth();
+    }
+
+    function handleKeyLogin(e) {
+      e.preventDefault();
+      const key = document.getElementById('apiKeyInput').value.trim();
+      if (!key) return;
+
+      localStorage.setItem('hydraremote_apiKey', key);
+      document.getElementById('auth-view').style.display = 'none';
+      checkAuth();
     }
 
     function logout() {
+      localStorage.removeItem('hydra_user_email');
       localStorage.removeItem('hydraremote_apiKey');
-      sessionStorage.removeItem('apiKey');
+      localStorage.removeItem('hydra_user_picture');
+      sessionStorage.clear();
       window.location.reload();
+    }
+
+    function openTutorial() {
+      const { email } = getAuth();
+      const example = email ? `hydraremote login ${email}` : `hydraremote login emailul_tau@gmail.com`;
+      document.getElementById('cli-cmd-example').textContent = example;
+      document.getElementById('tutorial-modal').style.display = 'flex';
+    }
+
+    function closeTutorial() {
+      document.getElementById('tutorial-modal').style.display = 'none';
     }
 
     function formatTimeAgo(timestamp) {
       if (!timestamp) return 'Niciodată';
       const seconds = Math.floor((Date.now() - timestamp) / 1000);
-      if (seconds < 15) return 'Chiar acum';
+      if (seconds < 20) return 'Chiar acum';
       if (seconds < 60) return `acum ${seconds} secunde`;
       const minutes = Math.floor(seconds / 60);
       if (minutes < 60) return `acum ${minutes} minute`;
@@ -461,11 +661,15 @@
     }
 
     async function loadDevices() {
-      const key = getStoredKey();
-      if (!key) return;
+      const { email, key } = getAuth();
+      if (!email && !key) return;
+
+      let url = `${API_BASE}/api/devices?`;
+      if (email) url += `email=${encodeURIComponent(email)}`;
+      else if (key) url += `apiKey=${encodeURIComponent(key)}`;
 
       try {
-        const res = await fetch(`${API_BASE}/api/devices?apiKey=${encodeURIComponent(key)}`);
+        const res = await fetch(url);
         const data = await res.json();
         renderDevices(data.devices || []);
       } catch (err) {
@@ -476,12 +680,16 @@
     function renderDevices(devices) {
       const container = document.getElementById('devices-container');
       if (devices.length === 0) {
+        const { email } = getAuth();
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">💻</div>
-            <h3>Niciun computer detectat încă</h3>
-            <p style="color: var(--text-muted); margin-top: 0.5rem;">
-              Pornește agentul pe PC-ul tău cu comanda <code>hydraremote start</code> pentru a apărea aici.
+            <h3>Niciun computer asociat contului ${email || ''}</h3>
+            <p style="color: var(--text-muted); margin-top: 0.6rem; max-width: 480px; margin-left: auto; margin-right: auto;">
+              Pentru a adăuga un PC, deschide un terminal pe acel PC și rulează comanda:<br>
+              <code style="background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px; color: #38bdf8; display: inline-block; margin-top: 8px;">
+                hydraremote login ${email || 'emailul_tau@gmail.com'}
+              </code>
             </p>
           </div>
         `;
@@ -507,6 +715,7 @@
                 <div><span>Sistem:</span> <strong>${d.platform || 'Necunoscut'}</strong></div>
                 <div><span>Local IP:</span> <code>${d.localIp || '-'}</code></div>
                 <div><span>Ultima activitate:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
+                ${d.userEmail ? `<div><span>Asociat:</span> <span style="color:#60a5fa;">${d.userEmail}</span></div>` : ''}
               </div>
             </div>
 
@@ -527,7 +736,7 @@
       }).join('');
     }
 
-    // Inițializare & Polling periodic la fiecare 4 secunde pentru statut live
+    // Inițializare & Polling
     checkAuth();
     setInterval(loadDevices, 4000);
   </script>
