@@ -574,12 +574,12 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
             Instalare pe PC / Server
           </span>
-          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'npm install -g https://remote.hydraromania.ro/hydraremote.tgz')">
+          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'curl -o hydraremote.tgz https://remote.hydraromania.ro/hydraremote.tgz && npm install -g hydraremote.tgz')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             Copiază
           </button>
         </div>
-        <code>npm install -g https://remote.hydraromania.ro/hydraremote.tgz</code>
+        <code>curl -o hydraremote.tgz https://remote.hydraromania.ro/hydraremote.tgz && npm install -g hydraremote.tgz</code>
       </div>
 
       <!-- Google Sign-In button container -->
@@ -635,7 +635,7 @@
       <p style="font-size: 0.85rem; color: var(--text-muted);">
         1. Pe calculatorul pe care dorești accesul la distanță, instalează HydraREMOTE:
       </p>
-      <pre style="margin-top: 0.5rem;">npm install -g https://remote.hydraromania.ro/hydraremote.tgz</pre>
+      <pre style="margin-top: 0.5rem;">curl -o hydraremote.tgz https://remote.hydraromania.ro/hydraremote.tgz && npm install -g hydraremote.tgz</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
         2. Generează cheia secretă a PC-ului:
       </p>
