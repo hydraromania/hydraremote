@@ -220,7 +220,7 @@ ${m.dim(`Tail: tail -f ${dn}`)}`;await _e("Logs",[{label:m.gray("\u2190 Back")}]
 `)),console.log(m.yellow(`  \u2B06  Run this command to update:
 `)),console.log(m.white.bold(`     npm i -g ${Le}
 `)),console.log(oe.orange("\u2550".repeat(s))+`
-`),process.exit(0)}else i==="ui"?await Js():i==="tui"?await Zs():process.exit(0)}var ta=[["hydraremote","Interactive menu (TUI). Falls back to help with no TTY."],["hydraremote start","Run server + tunnel in foreground (headless)."],["hydraremote key","Show permanent key + connect URL."],["hydraremote key --new","Regenerate the permanent key."],["hydraremote otk","Create a fresh one-time connect key + URL."],["hydraremote devices","List approved devices."],["hydraremote auto-approve <on|off>","Toggle device auto-approve."],["hydraremote approve <socketId>","Approve a pending device."],["hydraremote help","Show this help."]];function yo(){Mt(Te()),console.log(m.white.bold(`
+`),process.exit(0)}else i==="ui"?await Js():i==="tui"?await Zs():process.exit(0)}var ta=[["hydraremote","Interactive menu (TUI). Falls back to help with no TTY."],["hydraremote install","Instaleaza si porneste automat in background la pornirea Windows."],["hydraremote uninstall","Opreste procesul si sterge din Windows Startup."],["hydraremote status","Verifica starea serviciului din background."],["hydraremote start","Run server + tunnel in foreground (headless)."],["hydraremote key","Show permanent key + connect URL."],["hydraremote key --new","Regenerate the permanent key."],["hydraremote otk","Create a fresh one-time connect key + URL."],["hydraremote devices","List approved devices."],["hydraremote auto-approve <on|off>","Toggle device auto-approve."],["hydraremote approve <socketId>","Approve a pending device."],["hydraremote help","Show this help."]];function yo(){Mt(Te()),console.log(m.white.bold(`
 Usage:
 `));let e=Math.max(...ta.map(([n])=>n.length))+2;for(let[n,r]of ta)console.log("  "+m.cyan(n.padEnd(e))+m.gray(r));console.log()}async function Un(){return await ie()?!0:(console.log(m.red(`
 \u2717 Server not running. Start it first: `)+m.cyan("hydraremote start")+`
@@ -251,7 +251,83 @@ Approve with: `)+m.cyan("hydraremote approve <socketId>")+`
 \u2713 Approved
 `):m.red(`
 \u2717 Approve failed (invalid socketId?)
-`))}async function na(e){let n=e[2],r=e.slice(3);switch(n){case"help":case"-h":case"--help":return yo(),!0;case"key":return await ml(r.includes("--new")),!0;case"otk":return await hl(),!0;case"devices":return await gl(),!0;case"auto-approve":return await yl(r[0]),!0;case"approve":return await wl(r[0]),!0;case"login":return handleLogin(r[0]),!0;case"logout":return handleLogout(),!0;case"whoami":return handleWhoami(),!0;default:return!1}}var wo=process.argv[2];(wo==="version"||wo==="--version"||wo==="-v")&&(process.stdout.write(Te()+`
+`))}
+
+
+async function handleInstall() {
+  const fs = require('fs');
+  const path = require('path');
+  const cp = require('child_process');
+  const os = require('os');
+  
+  const exePath = process.execPath;
+  const startupDir = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
+  const vbsPath = path.join(startupDir, 'HydraREMOTE.vbs');
+  
+  const vbsContent = [
+    'Set WshShell = CreateObject("WScript.Shell")',
+    'WshShell.Run """' + exePath + '"" start", 0, False',
+    ''
+  ].join('\r\n');
+  
+  try {
+    fs.mkdirSync(startupDir, { recursive: true });
+    fs.writeFileSync(vbsPath, vbsContent, 'utf8');
+    console.log('\x1b[32m✓ Pornire automata configurata in Windows Startup:\x1b[0m');
+    console.log('  ' + vbsPath);
+  } catch (err) {
+    console.error('\x1b[31m✗ Eroare scriere startup:\x1b[0m', err.message);
+  }
+
+  try {
+    cp.exec('wscript.exe "' + vbsPath + '"');
+    console.log('\x1b[32m✓ Serviciul HydraREMOTE a fost pornit in fundal!\x1b[0m');
+  } catch (e) {}
+
+  const keyInfo = await qe();
+  console.log('\x1b[36m--------------------------------------------------\x1b[0m');
+  console.log('\x1b[36mCheie unica permanenta:\x1b[0m \x1b[1m' + (keyInfo ? keyInfo.key : '') + '\x1b[0m');
+  console.log('Aceasta cheie ramane neschimbata (se schimba doar la: hydraremote key --new)');
+  console.log('\x1b[36mWeb Dashboard:\x1b[0m         https://remote.hydraromania.ro/devices');
+  console.log('\x1b[36m--------------------------------------------------\x1b[0m');
+}
+
+async function handleUninstall() {
+  const fs = require('fs');
+  const path = require('path');
+  const cp = require('child_process');
+  const os = require('os');
+  
+  const startupDir = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
+  const vbsPath = path.join(startupDir, 'HydraREMOTE.vbs');
+  
+  if (fs.existsSync(vbsPath)) {
+    try {
+      fs.unlinkSync(vbsPath);
+      console.log('\x1b[32m✓ Sters din Windows Startup.\x1b[0m');
+    } catch (e) {
+      console.error(e.message);
+    }
+  }
+
+  try {
+    cp.execSync('taskkill /F /IM hydraremote.exe', { stdio: 'ignore' });
+    console.log('\x1b[32m✓ Procesul din fundal a fost oprit.\x1b[0m');
+  } catch (e) {
+    console.log('\x1b[33mNiciun proces activ de oprit.\x1b[0m');
+  }
+}
+
+async function handleStatus() {
+  const isRunning = await ie();
+  const keyInfo = await qe();
+  console.log('\x1b[36m=== HydraREMOTE Status ===\x1b[0m');
+  console.log('Status fundal:       ' + (isRunning ? '\x1b[32mOnline (activ)\x1b[0m' : '\x1b[31mOprit\x1b[0m'));
+  console.log('Cheie permanenta:    ' + (keyInfo ? keyInfo.key : 'Lipsa'));
+  console.log('Control panou Web:   https://remote.hydraromania.ro/devices');
+}
+
+async function na(e){let n=e[2],r=e.slice(3);switch(n){case"install":return await handleInstall(),!0;case"uninstall":return await handleUninstall(),!0;case"status":return await handleStatus(),!0;case"help":case"-h":case"--help":return yo(),!0;case"key":return await ml(r.includes("--new")),!0;case"otk":return await hl(),!0;case"devices":return await gl(),!0;case"auto-approve":return await yl(r[0]),!0;case"approve":return await wl(r[0]),!0;case"login":return handleLogin(r[0]),!0;case"logout":return handleLogout(),!0;case"whoami":return handleWhoami(),!0;default:return!1}}var wo=process.argv[2];(wo==="version"||wo==="--version"||wo==="-v")&&(process.stdout.write(Te()+`
 `),process.exit(0));Ho();async function vl(){let e=process.argv[2];if(await na(process.argv))return;process.argv.includes("--tray")||process.argv.includes("--auto")||process.argv.includes("--start")||ar(),e==="ui"?await Ws():e==="start"||process.argv.includes("--auto")?await Ys():process.argv.includes("--tray")||process.argv.includes("--start")?await Vs():process.stdin.isTTY?await ea():yo()}vl().catch(console.error);
 
 function getUserAccountEmail() {

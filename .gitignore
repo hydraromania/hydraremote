@@ -37,6 +37,8 @@ deploy_claim_feature.py
 # Build / Tarballs (keep only published packages if needed, or ignore local packs)
 package/
 *.tgz
+*.exe
+dist/
 
 # OS / Editor artifacts
 .DS_Store
