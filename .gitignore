@@ -1,7 +1,45 @@
+# Dependencies
 **/node_modules/
 node_modules/
+
+# Environment and sensitive keys
+.env
+.env.*
+*.env
+*keys.json
+keys.json
+devices_db.json
+*/devices_db.json
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa*
+*.id_rsa
+
+# Local runtime & logs
+.hydraremote/
+**/.hydraremote/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test scripts & temp files
+decoder.js
+test_eval.js
+check_env.py
+deploy_claim_feature.py
+*.tmp
+*.temp
+
+# Build / Tarballs (keep only published packages if needed, or ignore local packs)
 package/
 *.tgz
-.env
+
+# OS / Editor artifacts
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
