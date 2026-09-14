@@ -305,7 +305,7 @@ app.post('/api/devices/claim', async (req, res) => {
 app.get('/api/devices', async (req, res) => {
   const { apiKey, googleToken } = req.query;
   const now = Date.now();
-  const ONLINE_THRESHOLD_MS = 45 * 1000;
+  const ONLINE_THRESHOLD_MS = 300 * 1000;
 
   let authenticatedEmail = null;
 
