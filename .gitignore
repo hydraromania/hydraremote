@@ -40,6 +40,10 @@ package/
 *.exe
 dist/
 
+# Pachete XP generate local (contin CHEIE.txt cu cheia PC-ului)
+xp/out-*/
+xp/CHEIE.txt
+
 # OS / Editor artifacts
 .DS_Store
 Thumbs.db

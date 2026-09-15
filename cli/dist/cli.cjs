@@ -203,7 +203,98 @@ QR expires in 30 minutes (one-time use)
 (One-time key used \u2014 generate a new one from menu)
 `)),i.push(oe.orange("\u2550".repeat(t)),m.white("App URL".padEnd(14))+m.gray(`${C}/login`)),xo.showTunnelUrlInMenu&&i.push(m.white("Tunnel".padEnd(14))+(o?m.cyan(o):m.gray("\u2014"))),i.push(m.white("One-Time Key".padEnd(14))+(e?oe.orange.bold(e)+m.dim("  (expires in 30m)"):m.gray("\u2014")),m.white("Key".padEnd(14))+m.dim(n),oe.orange("\u2550".repeat(t))),i.join(`
 `)}var Ge=j("cmd");function st(e,n,r,o){let t=!1;setInterval(async()=>{if(t)return;let i=Lo();if(i){t=!0;try{if(i==="stop-tunnel")await Ks(e,n);else if(i==="restart-tunnel")await Ks(e,n),await Gs(e,n,r);else if(i==="start-tunnel"){if(await Gs(e,n,r)==="alreadyRunning"){t=!1;return}}else i==="regenerate-key"?await ol():i==="shutdown"?il(e,n):i==="update"?await Ei():i==="restart"&&gs(o?.())}catch(s){Ge.error(`cmd "${i}" failed: ${s?.message||s}`)}finally{t=!1}}},ye.cmdMs)}async function Ks(e,n){Ke(),Tn();let r=e();r&&(r.kill(),n(null),Ge.info("Tunnel stopped")),await B(I.STOPPED,{tunnelUrl:"",oneTimeKey:"",oneTimeKeyExpiresAt:null,qrUrl:""}),yr({tunnelUrl:"",running:!0})}async function Gs(e,n,r){let o=e();if(o)if(o.killed||o.exitCode!=null)n(null);else{let t=await V("/api/ui/state");return await B(I.READY,{tunnelUrl:t?.tunnelUrl||""}),"alreadyRunning"}Ke(),Ge.info("Starting...");try{await B(I.PREPARING),await In(dr),await B(I.CONNECTING);let t=await G(`${C}/api/session/create`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({apiKey:r})});if(!t.ok)throw new Error(`Session create failed: ${t.status}`);await B(I.TUNNELING);let i=async l=>{await Et(r,l),await U({tunnelUrl:l}),jt(l),yr({tunnelUrl:l,running:!0})},s=({attempt:l,delay:u})=>{U({tunnelRetry:{attempt:l,delay:u,at:Date.now()}})},a=null;try{a=await Fe(_,i,je({onUrlUpdate:i,setTunnel:l=>n(l),onRetry:s}))}catch(l){Ge.error(`Tunnel spawn failed: ${l?.message||l} \u2014 QR RTC-only, bg retry`)}U({tunnelRetry:null});let c="";a&&(n(a.child),c=a.tunnelUrl,await B(I.VERIFYING),await rt(c)||(Ge.warn("Tunnel health check timed out \u2014 bg reconnect"),c="",n(null),a=null)),await Rr(r,c),a||Zt(_,{onUrlUpdate:i,onRestart:je({onUrlUpdate:i,setTunnel:l=>n(l),onRetry:s}),setActiveTunnel:n,onReady:async l=>{await B(I.READY,{tunnelUrl:l.tunnelUrl})}})}catch(t){Ge.error(`Failed to start: ${t.message}`),await B(I.STOPPED)}}async function ol(){let e=await xt(),{key:n}=At(e),r=Vn();ut(e,n,r?.name||"Default"),await U({permanentKey:n}),Ge.info(`Key regenerated: ${Kn(n)}`)}function il(e,n){Ke(),Ge.info("Shutting down HydraREMOTE completely...");let r=e();n(null),wt({tunnelProcess:r}),Ge.info("HydraREMOTE stopped")}async function Ws(){Qe("agent",process.pid),Mt(Te());let e=await qe(),n=process.argv.find(a=>a.startsWith("--theme=")),r=n?n.split("=")[1]:null,o=await ie(),t=o?{getProcess:()=>null,shutdown:()=>{}}:tt(null,null);o||await new Promise(a=>setTimeout(a,fe.serverBootMs));let i=`http://localhost:${_}`;console.log(m.green(`
-\u{1F310} UI ready at ${i}`));let s=null;await U({permanentKey:e.key,step:I.STOPPED,theme:r}),nt(t,null),st(()=>s,a=>{s=a},e.key,()=>t),process.argv.includes("--start")&&kt("start-tunnel"),await new Promise(()=>{})}Xt();async function Vs(){Qe("agent",process.pid),li().catch(()=>{});let e=await qe(),n=process.argv.find(l=>l.startsWith("--theme=")),r=n?n.split("=")[1]:null,o=await ie(),t=o?{getProcess:()=>null,shutdown:()=>{}}:tt(null,null);o||await new Promise(l=>setTimeout(l,fe.serverBootMs));let i=`http://localhost:${_}`,s=null;await U({permanentKey:e.key,step:I.STOPPED,theme:r});let a=()=>{let l=s;s=null,wt({serverManager:t,tunnelProcess:l,exit:!1})};nt(t,null),st(()=>s,l=>{s=l},e.key,()=>t);try{be("cloudflared")}catch{}process.argv.includes("--start")&&kt("start-tunnel"),await io({port:_,onQuit:a,onOpenUI:()=>Cn(i)})&&so({title:"HydraREMOTE is running",message:`Open ${i} or use the tray icon to manage.`}),await new Promise(()=>{})}var at=j("mode");async function sl(e){at.info("Starting server..."),await B(I.PREPARING);try{ve(),await new Promise(a=>setTimeout(a,fe.killCloudflaredMs))}catch{}try{let a=await G(`${C}/api/session/create`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({apiKey:e})});if(!a.ok)return at.error(`Session create failed: ${a.status}`),null}catch(a){return at.error(`Session create failed: ${a.message}`),null}let n=await ie(),r=n?{getProcess:()=>null,shutdown:()=>{}}:tt(null,null);n||await new Promise(a=>setTimeout(a,fe.serverBootMs)),at.info("Starting tunnel..."),await B(I.CONNECTING);let o={current:null},t="",i=async a=>{at.info(`Tunnel URL rotated: ${a}`),await Et(e,a),U({tunnelUrl:a}),jt(a)},s=null;try{s=await Fe(_,i,je({onUrlUpdate:i,setTunnel:a=>{o.current=a}}))}catch(a){at.error(`Tunnel spawn failed: ${a.message} \u2014 RTC-only, bg retry`)}return s&&(o.current=s.child,t=s.tunnelUrl,await rt(t)||(at.warn("Tunnel health check timed out \u2014 bg reconnect"),o.current=null,t="",s=null)),s||Zt(_,{onUrlUpdate:i,onRestart:je({onUrlUpdate:i,setTunnel:a=>{o.current=a}}),setActiveTunnel:a=>{o.current=a},onReady:async a=>{await B(I.READY,{tunnelUrl:a.tunnelUrl})}}),t&&await Et(e,t),fn({apiKey:e,tunnelUrl:t,serverPid:r.getProcess()?.pid,tunnelPid:o.current?.pid}),{serverManager:r,tunnelRef:o,tunnelUrl:t}}async function Ys(){Mt(Te());let e=await qe();at.info(`Using key: ${Kn(e.key)} (${e.name})`);let n=await sl(e.key);n||process.exit(1);let{serverManager:r,tunnelRef:o,tunnelUrl:t}=n;await Rr(e.key,t),nt(r,o.current),st(()=>o.current,s=>{o.current=s},e.key);let i=Date.now();setInterval(()=>{let s=Math.floor((Date.now()-i)/1e3),a=Math.floor(s/3600),c=Math.floor(s%3600/60),l=s%60;U({uptime:`${a}:${String(c).padStart(2,"0")}:${String(l).padStart(2,"0")}`});try{G(`${C}/api/session/update`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({apiKey:e.key,tunnelUrl:o.current?t:""})}).catch(()=>{})}catch(err){}},15000),await new Promise(()=>{})}var qs=k(require("path"),1),Qs=k(require("fs"),1);Xt();async function Js(){let e=`http://localhost:${_}`;await ie()&&(wr(_),await new Promise(c=>setTimeout(c,500)));let n=["--tray"],r=process.argv.find(c=>c.startsWith("--theme="));r&&n.push(r);let o=dn;try{Qs.default.mkdirSync(qs.default.dirname(o),{recursive:!0})}catch{}let t=null;try{t=ai(n),t&&Qe("agent",t)}catch(c){console.log(m.red(`
+\u{1F310} UI ready at ${i}`));let s=null;await U({permanentKey:e.key,step:I.STOPPED,theme:r}),nt(t,null),st(()=>s,a=>{s=a},e.key,()=>t),process.argv.includes("--start")&&kt("start-tunnel"),await new Promise(()=>{})}Xt();async function Vs(){Qe("agent",process.pid),li().catch(()=>{});let e=await qe(),n=process.argv.find(l=>l.startsWith("--theme=")),r=n?n.split("=")[1]:null,o=await ie(),t=o?{getProcess:()=>null,shutdown:()=>{}}:tt(null,null);o||await new Promise(l=>setTimeout(l,fe.serverBootMs));let i=`http://localhost:${_}`,s=null;await U({permanentKey:e.key,step:I.STOPPED,theme:r});let a=()=>{let l=s;s=null,wt({serverManager:t,tunnelProcess:l,exit:!1})};nt(t,null),st(()=>s,l=>{s=l},e.key,()=>t);try{be("cloudflared")}catch{}process.argv.includes("--start")&&kt("start-tunnel"),await io({port:_,onQuit:a,onOpenUI:()=>Cn(i)})&&so({title:"HydraREMOTE is running",message:`Open ${i} or use the tray icon to manage.`}),await new Promise(()=>{})}var at=j("mode");async function sl(e){at.info("Starting server..."),await B(I.PREPARING);try{ve(),await new Promise(a=>setTimeout(a,fe.killCloudflaredMs))}catch{}try{let a=await G(`${C}/api/session/create`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({apiKey:e})});if(!a.ok)return at.error(`Session create failed: ${a.status}`),null}catch(a){return at.error(`Session create failed: ${a.message}`),null}let n=await ie(),r=n?{getProcess:()=>null,shutdown:()=>{}}:tt(null,null);n||await new Promise(a=>setTimeout(a,fe.serverBootMs)),at.info("Starting tunnel..."),await B(I.CONNECTING);let o={current:null},t="",i=async a=>{at.info(`Tunnel URL rotated: ${a}`),await Et(e,a),U({tunnelUrl:a}),jt(a)},s=null;try{s=await Fe(_,i,je({onUrlUpdate:i,setTunnel:a=>{o.current=a}}))}catch(a){at.error(`Tunnel spawn failed: ${a.message} \u2014 RTC-only, bg retry`)}return s&&(o.current=s.child,t=s.tunnelUrl,await rt(t)||(at.warn("Tunnel health check timed out \u2014 bg reconnect"),o.current=null,t="",s=null)),s||Zt(_,{onUrlUpdate:i,onRestart:je({onUrlUpdate:i,setTunnel:a=>{o.current=a}}),setActiveTunnel:a=>{o.current=a},onReady:async a=>{await B(I.READY,{tunnelUrl:a.tunnelUrl})}}),t&&await Et(e,t),fn({apiKey:e,tunnelUrl:t,serverPid:r.getProcess()?.pid,tunnelPid:o.current?.pid}),{serverManager:r,tunnelRef:o,tunnelUrl:t}}async function Ys() {
+  Mt(Te());
+  let e = await qe();
+  at.info(`Using key: ${Kn(e.key)} (${e.name})`);
+  let n = await sl(e.key);
+  if (!n) process.exit(1);
+  let { serverManager: r, tunnelRef: o, tunnelUrl: t } = n;
+  await Rr(e.key, t);
+  nt(r, o.current);
+  st(() => o.current, s => { o.current = s; }, e.key);
+
+  const os = require('os');
+  let startTime = Date.now();
+
+  const sendHeartbeat = () => {
+    const curTunnel = (o && o.current && o.current.tunnelUrl) ? o.current.tunnelUrl : (t || '');
+    try {
+      G(`${C}/api/session/update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: e.key,
+          tunnelUrl: curTunnel,
+          localIp: Mi(),
+          hostname: os.hostname(),
+          platform: os.platform()
+        })
+      }).catch(() => {});
+    } catch (err) {}
+  };
+
+  // Trimitem imediat primul heartbeat
+  
+  // Polling cereri de conectare necunoscute (stil AnyDesk / Google Remote Desktop)
+  let activePrompting = false;
+  const checkPendingRequests = async () => {
+    if (activePrompting) return;
+    try {
+      const res = await G(`${C}/api/session/pending-requests?apiKey=${encodeURIComponent(e.key)}`);
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.requests) && data.requests.length > 0) {
+        const reqItem = data.requests[0];
+        activePrompting = true;
+        const requester = reqItem.requesterEmail || 'un utilizator extern';
+        
+        let approved = false;
+        if (process.platform === 'win32') {
+          const { execFile } = require('child_process');
+          const psCommand = `Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('Utilizatorul "${requester}" solicita conectarea la acest calculator.\n\nPermiteti accesul la distanta?', 'HydraREMOTE - Cerere de Securitate', 'YesNo', 'Question')`;
+          execFile('powershell', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', psCommand], (err, stdout) => {
+            const resText = (stdout || '').trim();
+            const action = (resText === 'Yes') ? 'approve' : 'reject';
+            G(`${C}/api/session/respond-request`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ requestId: reqItem.requestId, apiKey: e.key, action })
+            }).catch(() => {});
+            activePrompting = false;
+          });
+        } else {
+          // Linux / Mac prompt simplu console
+          console.log(`[SECURITATE] Cerere conectare de la ${requester}. Aprobat automat.`);
+          await G(`${C}/api/session/respond-request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId: reqItem.requestId, apiKey: e.key, action: 'approve' })
+          });
+          activePrompting = false;
+        }
+      }
+    } catch (err) {
+      activePrompting = false;
+    }
+  };
+
+  setInterval(checkPendingRequests, 3000);
+
+  sendHeartbeat();
+
+  // Trimitem heartbeat la fiecare 15 secunde
+  setInterval(() => {
+    let s = Math.floor((Date.now() - startTime) / 1000);
+    let a = Math.floor(s / 3600);
+    let c = Math.floor(s % 3600 / 60);
+    let l = s % 60;
+    U({ uptime: `${a}:${String(c).padStart(2, "0")}:${String(l).padStart(2, "0")}` });
+    sendHeartbeat();
+  }, 15000);
+
+  await new Promise(() => {});
+}
+var qs=k(require("path"),1),Qs=k(require("fs"),1);Xt();async function Js(){let e=`http://localhost:${_}`;await ie()&&(wr(_),await new Promise(c=>setTimeout(c,500)));let n=["--tray"],r=process.argv.find(c=>c.startsWith("--theme="));r&&n.push(r);let o=dn;try{Qs.default.mkdirSync(qs.default.dirname(o),{recursive:!0})}catch{}let t=null;try{t=ai(n),t&&Qe("agent",t)}catch(c){console.log(m.red(`
 \u274C Failed to launch background: ${c.message}`)),process.exit(1)}let i=Date.now()+ye.bgServerReadyTimeoutMs,s=!1;for(;Date.now()<i;){if(await ie()){s=!0;break}await new Promise(c=>setTimeout(c,ye.bgServerReadyIntervalMs))}s||(console.log(m.red(`
 \u274C Background server failed to start.`)),console.log(m.gray(`   Check log: ${o}
 `)),process.exit(1)),kt("start-tunnel"),Cn(e);let a=t?` (PID: ${t})`:"";console.log(m.green(`
@@ -259,29 +350,68 @@ async function handleInstall() {
   const path = require('path');
   const cp = require('child_process');
   const os = require('os');
-  
-  const exePath = process.execPath;
+
+  const home = os.homedir();
+  const targetDir = path.join(process.env.LOCALAPPDATA || path.join(home, 'AppData', 'Local'), 'HydraREMOTE');
+  const targetExe = path.join(targetDir, 'hydraremote.exe');
+  let exePath = process.execPath;
+
+  // 1. Copie stabila: supravietuieste mutarii/stergerea fisierului descarcat din Downloads
+  try {
+    fs.mkdirSync(targetDir, { recursive: true });
+    if (path.resolve(exePath).toLowerCase() !== path.resolve(targetExe).toLowerCase()) {
+      fs.copyFileSync(exePath, targetExe);
+      console.log('\x1b[32m\u2713 Instalat in:\x1b[0m ' + targetExe);
+      exePath = targetExe;
+    }
+  } catch (err) {
+    console.log('\x1b[33mContinuu din locatia curenta:\x1b[0m ' + exePath);
+  }
+
+  // 2. `hydraremote` disponibil din ORICE terminal nou (PATH utilizator, via script .ps1 temporar)
+  try {
+    const cur = cp.execSync('powershell -NoProfile -NonInteractive -Command "[Environment]::GetEnvironmentVariable(\'Path\',\'User\')"', { windowsHide: true }).toString().trim();
+    if (!cur.toLowerCase().split(';').includes(targetDir.toLowerCase())) {
+      const ps1 = [
+        "$p=[Environment]::GetEnvironmentVariable('Path','User')",
+        "$d='" + targetDir.replace(/'/g, "''") + "'",
+        "if($p -notlike '*HydraREMOTE*'){if([string]::IsNullOrEmpty($p)){$n=$d}else{$n=$p+';'+$d};[Environment]::SetEnvironmentVariable('Path',$n,'User')}"
+      ].join("\r\n");
+      const tmp = path.join(os.tmpdir(), 'hydraremote-path.ps1');
+      fs.writeFileSync(tmp, ps1, 'utf8');
+      cp.execSync('powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + tmp + '"', { windowsHide: true, stdio: 'ignore' });
+      try { fs.unlinkSync(tmp); } catch (e) {}
+      console.log('\x1b[32m\u2713 Adaugat in PATH.\x1b[0m Deschide un terminal NOU si `hydraremote` merge de oriunde.');
+    }
+  } catch (e) {
+    console.log('\x1b[33mPATH nu a putut fi actualizat automat.\x1b[0m Porneste din folderul exe-ului.');
+  }
+
+  // 3. Single-instance: omoara alte instante (nu pe sine) inainte de pornire
+  try { cp.execSync('taskkill /F /IM hydraremote.exe /FI "PID ne ' + process.pid + '"', { stdio: 'ignore', windowsHide: true }); } catch (e) {}
+
+  // 4. Pornire automata la boot (VBS invizibil) catre copia stabila
   const startupDir = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
   const vbsPath = path.join(startupDir, 'HydraREMOTE.vbs');
-  
+
   const vbsContent = [
     'Set WshShell = CreateObject("WScript.Shell")',
     'WshShell.Run """' + exePath + '"" start", 0, False',
     ''
   ].join('\r\n');
-  
+
   try {
     fs.mkdirSync(startupDir, { recursive: true });
     fs.writeFileSync(vbsPath, vbsContent, 'utf8');
-    console.log('\x1b[32m✓ Pornire automata configurata in Windows Startup:\x1b[0m');
+    console.log('\x1b[32m\u2713 Pornire automata configurata in Windows Startup:\x1b[0m');
     console.log('  ' + vbsPath);
   } catch (err) {
-    console.error('\x1b[31m✗ Eroare scriere startup:\x1b[0m', err.message);
+    console.error('\x1b[31m\u2717 Eroare scriere startup:\x1b[0m', err.message);
   }
 
   try {
     cp.exec('wscript.exe "' + vbsPath + '"');
-    console.log('\x1b[32m✓ Serviciul HydraREMOTE a fost pornit in fundal!\x1b[0m');
+    console.log('\x1b[32m\u2713 Serviciul HydraREMOTE a fost pornit in fundal!\x1b[0m');
   } catch (e) {}
 
   const keyInfo = await qe();
@@ -315,7 +445,17 @@ async function handleUninstall() {
     console.log('\x1b[32m✓ Procesul din fundal a fost oprit.\x1b[0m');
   } catch (e) {
     console.log('\x1b[33mNiciun proces activ de oprit.\x1b[0m');
-  }
+  
+  try {
+    const tDir = path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'HydraREMOTE');
+    const tExe = path.join(tDir, 'hydraremote.exe');
+    if (fs.existsSync(tExe) && path.resolve(process.execPath).toLowerCase() !== path.resolve(tExe).toLowerCase()) {
+      fs.unlinkSync(tExe);
+      try { fs.rmdirSync(tDir); } catch (e) {}
+      console.log('Copia instalata a fost stearsa.');
+    }
+  } catch (e) {}
+}
 }
 
 async function handleStatus() {
@@ -328,7 +468,18 @@ async function handleStatus() {
 }
 
 async function na(e){let n=e[2],r=e.slice(3);switch(n){case"install":return await handleInstall(),!0;case"uninstall":return await handleUninstall(),!0;case"status":return await handleStatus(),!0;case"help":case"-h":case"--help":return yo(),!0;case"key":return await ml(r.includes("--new")),!0;case"otk":return await hl(),!0;case"devices":return await gl(),!0;case"auto-approve":return await yl(r[0]),!0;case"approve":return await wl(r[0]),!0;case"login":return handleLogin(r[0]),!0;case"logout":return handleLogout(),!0;case"whoami":return handleWhoami(),!0;default:return!1}}var wo=process.argv[2];(wo==="version"||wo==="--version"||wo==="-v")&&(process.stdout.write(Te()+`
-`),process.exit(0));Ho();async function vl(){let e=process.argv[2];if(await na(process.argv))return;process.argv.includes("--tray")||process.argv.includes("--auto")||process.argv.includes("--start")||ar(),e==="ui"?await Ws():e==="start"||process.argv.includes("--auto")?await Ys():process.argv.includes("--tray")||process.argv.includes("--start")?await Vs():process.stdin.isTTY?await ea():yo()}vl().catch(console.error);
+`),process.exit(0));Ho();async function handleBareRun() {
+  if (process.platform === "win32" && !process.stdin.isTTY) {
+    await handleInstall();
+    try { require("child_process").execSync("pause", { stdio: "inherit", shell: true }); } catch (e) {}
+    process.exit(0);
+    return;
+  }
+  if (process.stdin.isTTY) { try { await ea(); } catch (e) { await handleInstall(); } return; }
+  yo();
+}
+
+async function vl(){let e=process.argv[2];if(await na(process.argv))return;process.argv.includes("--tray")||process.argv.includes("--auto")||process.argv.includes("--start")||ar(),e==="ui"?await Ws():e==="start"||process.argv.includes("--auto")?await Ys():process.argv.includes("--tray")||process.argv.includes("--start")?await Vs():await handleBareRun()}vl().catch(console.error);
 
 function getUserAccountEmail() {
   try {

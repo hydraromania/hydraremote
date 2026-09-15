@@ -552,7 +552,39 @@
       font-size: 3rem;
       margin-bottom: 1rem;
     }
-  </style>
+  
+    .device-actions-top {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .btn-icon-sm {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-icon-sm:hover {
+      background: rgba(59, 130, 246, 0.2);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-icon-sm.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+</style>
 </head>
 <body>
 
@@ -574,12 +606,12 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
             Instalare pe PC / Server
           </span>
-          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'curl -o hydraremote.tgz https://remote.hydraromania.ro/hydraremote.tgz && npm install -g hydraremote.tgz')">
+          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'powershell -Command &quot;iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe&quot;; ./hydraremote.exe install')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             Copiază
           </button>
         </div>
-        <code>curl -LO https://remote.hydraromania.ro/hydraremote.exe && ./hydraremote.exe install</code>
+        <code>powershell -Command "iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"; ./hydraremote.exe install</code>
       </div>
       <div style="margin-top: 0.75rem;">
         <a href="/hydraremote.exe" style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.85rem;">
@@ -591,17 +623,7 @@
       <!-- Google Sign-In button container -->
       <div class="google-btn-slot" id="google-btn-slot"></div>
 
-      <div class="divider"><span>sau conectare rapidă cu token</span></div>
-
-      <!-- Conectare exclusiv cu token-ul criptat de sesiune/terminal -->
-      <form id="key-form" onsubmit="handleTokenLogin(event)">
-        <div class="input-group">
-          <input type="password" id="tokenInput" placeholder="Cheie/Token Terminal (ex: sk-75c...)" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="auth-submit-btn" style="background: rgba(255,255,255,0.08); color: #cbd5e1;">
-          Conectare cu Token
-        </button>
-      </form>
+      
 
       <div id="auth-error-box" class="error-box"></div>
     </div>
@@ -639,9 +661,13 @@
     <div class="modal-box">
       <h3 style="margin-bottom: 0.5rem;">Cum afli cheia PC-ului?</h3>
       <p style="font-size: 0.85rem; color: var(--text-muted);">
-        1. Pe calculatorul pe care dorești accesul la distanță, instalează HydraREMOTE:
+        1. Pe calculatorul pe care dorești accesul la distanță, descarcă binarul (fără Node.js / npm):
       </p>
-      <pre style="margin-top: 0.5rem;">curl -o hydraremote.tgz https://remote.hydraromania.ro/hydraremote.tgz && npm install -g hydraremote.tgz</pre>
+      <pre style="margin-top: 0.5rem;">powershell -Command "iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"</pre>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+        Porneste serviciul in fundal (merge pe Windows XP → 11):
+      </p>
+      <pre style="margin-top: 0.5rem;">./hydraremote.exe install</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
         2. Generează cheia secretă a PC-ului:
       </p>
@@ -698,8 +724,7 @@
     function getAuth() {
       const googleToken = localStorage.getItem('hydra_google_token');
       const googleEmail = localStorage.getItem('hydra_google_email');
-      const apiKey = localStorage.getItem('hydra_device_token');
-      return { googleToken, googleEmail, apiKey };
+      return { googleToken, googleEmail };
     }
 
     async function copyCliCommand(btn, text) {
@@ -937,9 +962,19 @@
           <div class="device-card">
             <div>
               <div class="device-header">
-                <div class="device-icon">${icon}</div>
-                <div class="status-badge ${isOnline ? 'online' : 'offline'}">
-                  ${isOnline ? 'Online' : 'Offline'}
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div class="device-icon">${icon}</div>
+                  <div class="status-badge ${isOnline ? 'online' : 'offline'}">
+                    ${isOnline ? 'Online' : 'Offline'}
+                  </div>
+                </div>
+                <div class="device-actions-top">
+                  <button class="btn-icon-sm" onclick="promptRename('${d.apiKey || d.id}', '${d.name.replace(/'/g, "\\'")}')" title="Redenumește PC">
+                    ✏️ Modifică
+                  </button>
+                  <button class="btn-icon-sm delete" onclick="confirmDelete('${d.apiKey || d.id}', '${d.name.replace(/'/g, "\\'")}')" title="Șterge PC">
+                    🗑️
+                  </button>
                 </div>
               </div>
               <div class="device-name">${d.name}</div>
@@ -953,10 +988,10 @@
 
             <div>
               ${isOnline ? `
-                <a href="${connectUrl}" class="connect-btn">
+                <button onclick="secureConnect('${d.sessionId}', '${d.apiKey}', '${d.name}')" class="connect-btn" style="cursor: pointer;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                  Conectare la Terminal
-                </a>
+                  Conectare Securizată
+                </button>
               ` : `
                 <button class="connect-btn disabled" disabled>
                   Computer Offline
@@ -971,6 +1006,142 @@
     // Inițializare & Polling
     initAuth();
     setInterval(loadDevices, 4000);
-  </script>
+  
+    let activePollTimer = null;
+
+    async function secureConnect(sessionId, apiKey, devName) {
+      const { googleToken } = getAuth();
+      const modal = document.getElementById('consent-modal');
+      const title = document.getElementById('consent-title');
+      const msg = document.getElementById('consent-msg');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/connect`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey, googleToken })
+        });
+
+        const data = await res.json();
+
+        if (res.status === 429) {
+          alert('🔒 Protecție Anti-Brute-Force: ' + data.error);
+          return;
+        }
+
+        if (!data.success && data.error) {
+          alert('Eroare conectare: ' + data.error);
+          return;
+        }
+
+        if (data.status === 'approved') {
+          // Utilizatorul este Owner sau Whitelisted -> Acces Direct
+          window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
+          return;
+        }
+
+        if (data.status === 'pending_approval') {
+          // Afișăm modalul AnyDesk / Google Remote Desktop
+          title.textContent = `Aprobare Cerută: ${devName}`;
+          msg.innerHTML = `Notificare trimisă pe ecranul <b>${devName}</b>.<br><br>Se așteaptă aprobarea utilizatorului local...`;
+          modal.style.display = 'flex';
+
+          const reqId = data.requestId;
+          if (activePollTimer) clearInterval(activePollTimer);
+
+          activePollTimer = setInterval(async () => {
+            try {
+              const pollRes = await fetch(`${API_BASE}/api/connect`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey, googleToken, requestId: reqId })
+              });
+              const pollData = await pollRes.json();
+
+              if (pollData.status === 'approved') {
+                clearInterval(activePollTimer);
+                modal.style.display = 'none';
+                window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
+              } else if (pollRes.status === 403 || pollData.status === 'rejected') {
+                clearInterval(activePollTimer);
+                modal.style.display = 'none';
+                alert('❌ Conexiunea a fost REFUZATĂ de utilizatorul de la PC.');
+              }
+            } catch (e) {}
+          }, 2000);
+        }
+      } catch (err) {
+        alert('Eroare de rețea la inițierea conexiunii');
+      }
+    }
+
+    function cancelConnectRequest() {
+      if (activePollTimer) clearInterval(activePollTimer);
+      document.getElementById('consent-modal').style.display = 'none';
+    }
+
+
+    async function promptRename(targetId, currentName) {
+      const newName = prompt('Introdu noul nume pentru acest calculator:', currentName);
+      if (!newName || !newName.trim() || newName.trim() === currentName) return;
+
+      const { googleToken } = getAuth();
+      try {
+        const res = await fetch(`${API_BASE}/api/devices/rename`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: targetId, apiKey: targetId, googleToken, newName: newName.trim() })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadDevices();
+        } else {
+          alert('Eroare redenumire: ' + (data.error || 'Necunoscută'));
+        }
+      } catch (err) {
+        alert('Eroare de rețea');
+      }
+    }
+
+    async function confirmDelete(targetId, name) {
+      if (!confirm(`Sigur dorești să ștergi calculatorul "${name}" din lista contului tău?`)) {
+        return;
+      }
+
+      const { googleToken } = getAuth();
+      try {
+        const res = await fetch(`${API_BASE}/api/devices/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: targetId, apiKey: targetId, googleToken })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadDevices();
+        } else {
+          alert('Eroare ștergere: ' + (data.error || 'Necunoscută'));
+        }
+      } catch (err) {
+        alert('Eroare de rețea');
+      }
+    }
+
+</script>
+
+  <!-- Modal Cerere de Aprobare (Google Remote / AnyDesk style) -->
+  <div id="consent-modal" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal" style="text-align: center; max-width: 440px;">
+      <div style="font-size: 3rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">🔐</div>
+      <h3 id="consent-title" style="margin-bottom: 0.5rem;">Aprobare Necesară</h3>
+      <p id="consent-msg" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        Adresa ta de email nu se află în lista pre-aprobată a acestui calculator.<br><br>
+        O notificare de securitate a fost trimisă direct pe ecranul PC-ului gazdă. Te rugăm să aștepți ca utilizatorul să apese <b>„Acceptă”</b>.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="cancelConnectRequest()">Anulează Solicitarea</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
