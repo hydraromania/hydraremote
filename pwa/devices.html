@@ -3,44 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HydraREMOTE - Control Center 2026</title>
+  <title>HydraREMOTE - Control Center</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
-      --bg: #07090e;
-      --bg-surface: rgba(15, 23, 42, 0.65);
-      --bg-surface-hover: rgba(30, 41, 59, 0.8);
-      --card-border: rgba(148, 163, 184, 0.12);
-      --card-border-glow: rgba(56, 189, 248, 0.35);
-      --accent: #0ea5e9;
-      --accent-hover: #0284c7;
-      --accent-glow: rgba(14, 165, 233, 0.35);
-      --accent-grad: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg-dark: #09090b;
+      --bg-card: rgba(18, 18, 24, 0.85);
+      --bg-card-hover: rgba(28, 28, 38, 0.95);
+      --card-border: rgba(255, 255, 255, 0.1);
+      
+      /* Culori vii cerute: alb, rosu, negru, portocaliu, mov */
+      --white: #ffffff;
+      --red-vivid: #ff1e42;
+      --orange-vivid: #ff6b00;
+      --purple-vivid: #a855f7;
+      --purple-dark: #7e22ce;
+      
+      --grad-fire: linear-gradient(135deg, #ff1e42 0%, #ff6b00 100%);
+      --grad-purple: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      --grad-electric: linear-gradient(135deg, #ff6b00 0%, #a855f7 100%);
+      --grad-dark-glow: linear-gradient(135deg, rgba(255,30,66,0.15) 0%, rgba(168,85,247,0.15) 100%);
+      
+      --text-main: #ffffff;
+      --text-dim: #a1a1aa;
+      --text-muted: #71717a;
+      
       --online: #10b981;
-      --online-glow: rgba(16, 185, 129, 0.35);
-      --offline: #64748b;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --glass: blur(16px);
+      --online-glow: rgba(16, 185, 129, 0.4);
+      --offline: #52525b;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
 
     body {
-      background: radial-gradient(circle at 50% 0%, #0f172a 0%, var(--bg) 65%);
-      color: var(--text);
+      background: radial-gradient(circle at 50% 0%, #1f0b24 0%, #0c0814 45%, var(--bg-dark) 90%);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -52,20 +59,21 @@
       content: "";
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 24px 24px;
+      background: radial-gradient(circle at 10% 20%, rgba(255, 30, 66, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
       pointer-events: none;
       z-index: 0;
     }
 
+    /* Header */
     header {
-      padding: 1rem 2.5rem;
+      padding: 1.1rem 2.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: var(--glass);
-      background: rgba(7, 9, 14, 0.75);
+      backdrop-filter: blur(20px);
+      background: rgba(9, 9, 11, 0.8);
       position: sticky;
       top: 0;
       z-index: 50;
@@ -74,31 +82,31 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
-      font-weight: 800;
-      font-size: 1.3rem;
+      gap: 0.9rem;
+      font-weight: 700;
+      font-size: 1.35rem;
       letter-spacing: -0.5px;
-      color: #fff;
+      color: var(--white);
     }
 
-    .brand-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--accent-grad);
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--grad-fire);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 16px var(--accent-glow);
+      box-shadow: 0 0 20px rgba(255, 30, 66, 0.4);
     }
 
     .brand-badge {
-      font-size: 0.65rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
-      background: rgba(14, 165, 233, 0.15);
-      border: 1px solid rgba(14, 165, 233, 0.3);
-      color: #38bdf8;
-      padding: 3px 8px;
+      background: rgba(168, 85, 247, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #d8b4fe;
+      padding: 3px 9px;
       border-radius: 9999px;
       font-weight: 700;
       letter-spacing: 0.6px;
@@ -107,47 +115,47 @@
     .user-pill {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 0.4rem 0.95rem;
+      gap: 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.45rem 1.1rem;
       border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.85rem;
-      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.88rem;
+      backdrop-filter: blur(10px);
     }
 
     .user-avatar {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      background: var(--accent-grad);
+      background: var(--grad-purple);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: white;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
     }
 
     .logout-btn {
       background: none;
       border: none;
-      color: #f87171;
+      color: var(--red-vivid);
       cursor: pointer;
-      font-weight: 600;
-      font-size: 0.8rem;
-      padding: 3px 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 4px 8px;
       border-radius: 6px;
       transition: all 0.2s ease;
     }
     .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.12);
-      color: #ef4444;
+      background: rgba(255, 30, 66, 0.15);
     }
 
     main {
       flex: 1;
-      max-width: 1240px;
+      max-width: 1260px;
       width: 100%;
       margin: 0 auto;
       padding: 3rem 2rem;
@@ -159,23 +167,23 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2.75rem;
       flex-wrap: wrap;
       gap: 1.5rem;
     }
 
     .section-title {
-      font-size: 1.85rem;
+      font-size: 2.1rem;
       font-weight: 800;
-      letter-spacing: -0.7px;
-      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      letter-spacing: -0.8px;
+      background: linear-gradient(135deg, #ffffff 30%, #f43f5e 70%, #ff6b00 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
     }
 
     .section-subtitle {
-      color: var(--text-muted);
+      color: var(--text-dim);
       font-size: 0.95rem;
     }
 
@@ -188,89 +196,103 @@
     .action-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.55rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: 12px;
-      font-size: 0.88rem;
-      font-weight: 600;
+      gap: 0.6rem;
+      padding: 0.8rem 1.4rem;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
     }
 
     .action-btn.primary {
-      background: var(--accent-grad);
+      background: var(--grad-fire);
       color: white;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 20px var(--accent-glow);
+      box-shadow: 0 4px 22px rgba(255, 30, 66, 0.4);
     }
     .action-btn.primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(14, 165, 233, 0.5);
+      box-shadow: 0 6px 28px rgba(255, 107, 0, 0.55);
     }
 
     .action-btn.secondary {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e2e8f0;
-      backdrop-filter: blur(8px);
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #f3e8ff;
+      backdrop-filter: blur(10px);
     }
     .action-btn.secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(168, 85, 247, 0.22);
+      border-color: rgba(168, 85, 247, 0.6);
       transform: translateY(-2px);
+      color: #fff;
     }
 
     /* Device Grid */
     .device-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1.75rem;
+      gap: 1.85rem;
     }
 
     .device-card {
-      background: var(--bg-surface);
+      background: var(--bg-card);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 1.65rem;
-      box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.4);
-      backdrop-filter: var(--glass);
+      border-radius: 22px;
+      padding: 1.75rem;
+      box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
+      overflow: hidden;
+    }
+
+    .device-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--grad-fire);
+      opacity: 0.7;
     }
 
     .device-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--card-border-glow);
-      box-shadow: 0 20px 40px -8px var(--accent-glow);
-      background: var(--bg-surface-hover);
+      transform: translateY(-5px);
+      border-color: rgba(255, 107, 0, 0.45);
+      box-shadow: 0 20px 44px -8px rgba(255, 30, 66, 0.3);
+      background: var(--bg-card-hover);
     }
 
     .device-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.3rem;
     }
 
-    .device-icon {
-      width: 46px;
-      height: 46px;
+    .device-icon-wrapper {
+      width: 48px;
+      height: 48px;
       border-radius: 14px;
-      background: rgba(14, 165, 233, 0.12);
-      border: 1px solid rgba(14, 165, 233, 0.25);
+      background: rgba(255, 107, 0, 0.12);
+      border: 1px solid rgba(255, 107, 0, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      color: var(--orange-vivid);
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       padding: 5px 12px;
       border-radius: 9999px;
       font-size: 0.75rem;
@@ -282,8 +304,8 @@
     .status-badge.online {
       background: rgba(16, 185, 129, 0.15);
       color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      box-shadow: 0 0 14px var(--online-glow);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 16px var(--online-glow);
     }
 
     .status-badge.online::before {
@@ -292,14 +314,14 @@
       height: 8px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      box-shadow: 0 0 10px #10b981;
       animation: pulse 2s infinite;
     }
 
     .status-badge.offline {
-      background: rgba(100, 116, 139, 0.15);
-      color: #94a3b8;
-      border: 1px solid rgba(100, 116, 139, 0.25);
+      background: rgba(82, 82, 91, 0.25);
+      color: #a1a1aa;
+      border: 1px solid rgba(82, 82, 91, 0.4);
     }
 
     .status-badge.offline::before {
@@ -307,35 +329,35 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #64748b;
+      background: #71717a;
     }
 
     @keyframes pulse {
       0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.2); opacity: 1; }
+      50% { transform: scale(1.25); opacity: 1; }
       100% { transform: scale(0.95); opacity: 0.8; }
     }
 
     .device-name {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       font-weight: 700;
-      color: #fff;
-      margin-bottom: 0.4rem;
+      color: var(--white);
+      margin-bottom: 0.45rem;
       word-break: break-all;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.4px;
     }
 
     .device-meta {
       font-size: 0.82rem;
-      color: var(--text-muted);
+      color: var(--text-dim);
       margin-bottom: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      background: rgba(0, 0, 0, 0.25);
-      padding: 0.85rem;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      gap: 7px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .device-meta div {
@@ -346,39 +368,39 @@
 
     .device-meta code {
       font-family: 'JetBrains Mono', monospace;
-      color: #38bdf8;
-      background: rgba(14, 165, 233, 0.1);
-      padding: 2px 6px;
-      border-radius: 5px;
+      color: #ff9800;
+      background: rgba(255, 152, 0, 0.12);
+      padding: 2px 7px;
+      border-radius: 6px;
       font-size: 0.78rem;
     }
 
     .connect-btn {
       width: 100%;
-      padding: 0.85rem 1.25rem;
-      background: var(--accent-grad);
+      padding: 0.9rem 1.3rem;
+      background: var(--grad-fire);
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-weight: 700;
-      font-size: 0.92rem;
+      font-size: 0.94rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
+      gap: 0.65rem;
       text-decoration: none;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 18px rgba(255, 30, 66, 0.35);
     }
 
     .connect-btn:hover {
-      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+      box-shadow: 0 6px 26px rgba(255, 107, 0, 0.55);
       transform: translateY(-2px);
     }
 
     .connect-btn.disabled {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-muted);
       cursor: not-allowed;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -388,16 +410,16 @@
 
     .device-actions-top {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.45rem;
       align-items: center;
     }
 
     .btn-icon-sm {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      border-radius: 8px;
-      padding: 5px 9px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-dim);
+      border-radius: 9px;
+      padding: 6px 10px;
       cursor: pointer;
       font-size: 0.8rem;
       transition: all 0.2s ease;
@@ -407,15 +429,15 @@
     }
 
     .btn-icon-sm:hover {
-      background: rgba(14, 165, 233, 0.15);
+      background: rgba(168, 85, 247, 0.2);
       color: #fff;
-      border-color: var(--accent);
+      border-color: var(--purple-vivid);
     }
 
     .btn-icon-sm.delete:hover {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border-color: #ef4444;
+      background: rgba(255, 30, 66, 0.2);
+      color: var(--red-vivid);
+      border-color: var(--red-vivid);
     }
 
     /* Modal / Auth View */
@@ -423,8 +445,8 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(7, 9, 14, 0.85);
-      backdrop-filter: blur(20px);
+      background: rgba(9, 9, 11, 0.88);
+      backdrop-filter: blur(24px);
       z-index: 100;
       align-items: center;
       justify-content: center;
@@ -432,26 +454,27 @@
     }
 
     .auth-card {
-      background: #0f172a;
-      border: 1px solid var(--card-border-glow);
+      background: #130f1c;
+      border: 1px solid rgba(255, 107, 0, 0.35);
       padding: 2.75rem 2.25rem;
-      border-radius: 24px;
-      max-width: 460px;
+      border-radius: 26px;
+      max-width: 480px;
       width: 100%;
-      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 24px 56px -12px rgba(255, 30, 66, 0.25);
       text-align: center;
     }
 
     .auth-title {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       font-weight: 800;
       margin-bottom: 0.5rem;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.6px;
+      color: var(--white);
     }
 
     .auth-subtitle {
-      font-size: 0.88rem;
-      color: var(--text-muted);
+      font-size: 0.9rem;
+      color: var(--text-dim);
       margin-bottom: 1.75rem;
       line-height: 1.5;
     }
@@ -464,10 +487,10 @@
     }
 
     .cli-install-box {
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 14px;
-      padding: 1rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-radius: 16px;
+      padding: 1.1rem;
       margin: 1.25rem 0 1.5rem 0;
       text-align: left;
     }
@@ -475,45 +498,45 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.75rem;
     }
     .cli-install-box .cli-title {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: #38bdf8;
+      color: var(--orange-vivid);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
     .cli-install-box .cli-copy-btn {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #38bdf8;
-      padding: 0.3rem 0.65rem;
-      border-radius: 7px;
-      font-size: 0.74rem;
-      font-weight: 600;
+      background: rgba(255, 107, 0, 0.15);
+      border: 1px solid rgba(255, 107, 0, 0.4);
+      color: #ff9800;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
     .cli-install-box .cli-copy-btn:hover {
-      background: rgba(56, 189, 248, 0.25);
+      background: rgba(255, 107, 0, 0.3);
       color: #fff;
     }
     .cli-install-box code {
       display: block;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      color: #f1f5f9;
-      background: #07090e;
-      padding: 0.75rem;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      color: #ffffff;
+      background: #09090b;
+      padding: 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       user-select: all;
       overflow-x: auto;
       white-space: nowrap;
@@ -526,18 +549,18 @@
 
     .input-group label {
       display: block;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
-      color: #cbd5e1;
+      color: #e4e4e7;
     }
 
     .input-group input {
       width: 100%;
-      padding: 0.85rem 1rem;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
       color: white;
       font-size: 0.95rem;
       outline: none;
@@ -545,36 +568,36 @@
     }
 
     .input-group input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: var(--orange-vivid);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.25);
     }
 
     .auth-submit-btn {
       width: 100%;
-      padding: 0.85rem;
-      background: var(--accent-grad);
+      padding: 0.9rem;
+      background: var(--grad-fire);
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       color: white;
       font-weight: 700;
       font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 16px var(--accent-glow);
+      box-shadow: 0 4px 18px rgba(255, 30, 66, 0.35);
     }
 
     .auth-submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+      box-shadow: 0 6px 24px rgba(255, 107, 0, 0.5);
     }
 
-    /* Modal Add Device by Key / Tutorial */
+    /* Modals */
     #add-device-modal, #tutorial-modal, #consent-modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(7, 9, 14, 0.85);
-      backdrop-filter: blur(16px);
+      background: rgba(9, 9, 11, 0.88);
+      backdrop-filter: blur(20px);
       z-index: 110;
       align-items: center;
       justify-content: center;
@@ -582,44 +605,73 @@
     }
 
     .modal-box {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
+      background: #141021;
+      border: 1px solid rgba(168, 85, 247, 0.3);
       padding: 2.5rem;
-      border-radius: 24px;
-      max-width: 500px;
+      border-radius: 26px;
+      max-width: 520px;
       width: 100%;
-      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 24px 56px -12px rgba(0, 0, 0, 0.8);
     }
 
     .modal-box pre {
-      background: #07090e;
-      padding: 0.9rem 1rem;
-      border-radius: 10px;
-      color: #38bdf8;
+      background: #09090b;
+      padding: 0.95rem 1.1rem;
+      border-radius: 12px;
+      color: #ff9800;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
       margin: 0.85rem 0;
       overflow-x: auto;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .cmd-row {
+      position: relative;
+      margin-top: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+    .cmd-row pre {
+      margin: 0;
+      padding-right: 4.5rem;
+    }
+    .cmd-copy-floating {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 107, 0, 0.2);
+      border: 1px solid rgba(255, 107, 0, 0.4);
+      color: #ff9800;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .cmd-copy-floating:hover {
+      background: rgba(255, 107, 0, 0.4);
+      color: #fff;
     }
 
     .error-box {
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #ff4d6d;
+      background: rgba(255, 30, 66, 0.14);
+      border: 1px solid rgba(255, 30, 66, 0.3);
       padding: 0.85rem;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 0.85rem;
       margin-top: 1rem;
       display: none;
     }
 
     .success-box {
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       padding: 0.85rem;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 0.85rem;
       margin-top: 1rem;
       display: none;
@@ -629,14 +681,22 @@
     .empty-state {
       text-align: center;
       padding: 5rem 2rem;
-      background: var(--bg-surface);
-      border: 1px dashed rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
+      background: var(--bg-card);
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
       grid-column: 1 / -1;
     }
     .empty-icon {
-      font-size: 3.5rem;
-      margin-bottom: 1.25rem;
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      background: var(--grad-fire);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem auto;
+      color: white;
+      box-shadow: 0 0 30px rgba(255, 30, 66, 0.4);
     }
   </style>
 </head>
@@ -646,32 +706,33 @@
   <div id="auth-view">
     <div class="auth-card">
       <div class="brand" style="justify-content: center; margin-bottom: 1.25rem;">
-        <div class="brand-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
         <span>HydraREMOTE</span>
-        <span class="brand-badge">Google Auth</span>
+        <span class="brand-badge">Auth</span>
       </div>
-      <h2 class="auth-title">Autentificare Securizată</h2>
-      <p class="auth-subtitle">Selectează contul Google pentru acces la terminalele asociate.</p>
+      <h2 class="auth-title">Autentificare Rapidă</h2>
+      <p class="auth-subtitle">Conectează-te cu Google pentru a-ți administra terminalele securizate.</p>
       
       <!-- CLI Quick Install snippet -->
       <div class="cli-install-box">
         <div class="cli-header">
           <span class="cli-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
-            Instalare pe PC / Server
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+            Instalare Rapidă PowerShell
           </span>
-          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'powershell -Command &quot;$ProgressPreference=\'SilentlyContinue\'; iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe&quot;; ./hydraremote.exe install')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;[System.Net.ServicePointManager]::SecurityProtocol=[System.Net.SecurityProtocolType]::Tls12;(New-Object System.Net.WebClient).DownloadFile(\'https://remote.hydraromania.ro/hydraremote.exe\',\'hydraremote.exe\')&quot;; ./hydraremote.exe install')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             Copiază
           </button>
         </div>
-        <code>powershell -Command "$ProgressPreference='SilentlyContinue'; iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"; ./hydraremote.exe install</code>
+        <code>powershell -NoProfile -ExecutionPolicy Bypass -Command "[System.Net.ServicePointManager]::SecurityProtocol=[System.Net.SecurityProtocolType]::Tls12;(New-Object System.Net.WebClient).DownloadFile('https://remote.hydraromania.ro/hydraremote.exe','hydraremote.exe')"; ./hydraremote.exe install</code>
       </div>
+
       <div style="margin-top: 0.75rem; margin-bottom: 1.25rem;">
-        <a href="/hydraremote.exe" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 0.6rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.85rem; transition: all 0.2s ease;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <a href="/hydraremote.exe" style="display: inline-flex; align-items: center; gap: 0.55rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: white; padding: 0.65rem 1.1rem; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.88rem; transition: all 0.2s ease;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Descarcă HydraREMOTE.exe
         </a>
       </div>
@@ -686,11 +747,14 @@
   <div id="add-device-modal" onclick="if(event.target===this)closeAddModal()">
     <div class="modal-box">
       <div class="brand" style="margin-bottom: 1.25rem;">
+        <div class="brand-icon" style="width: 34px; height: 34px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
         <span>Adaugă PC în Cont</span>
-        <span class="brand-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">Secret Key</span>
+        <span class="brand-badge">Cheie SK</span>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5;">
-        Introdu cheia permanentă (generată de comanda <code>hydraremote key</code> pe PC). Calculatorul va fi legat automat de contul tău.
+      <p style="font-size: 0.88rem; color: var(--text-dim); margin-bottom: 1.5rem; line-height: 1.5;">
+        Introdu cheia permanentă obținută prin comanda <code>hydraremote key</code> pe PC-ul țintă.
       </p>
 
       <form onsubmit="handleClaimDevice(event)">
@@ -700,34 +764,57 @@
         </div>
         <div class="input-group">
           <label for="claimNameInput">Nume Personalizat (opțional):</label>
-          <input type="text" id="claimNameInput" placeholder="ex: Calculator Birou / Server Producție">
+          <input type="text" id="claimNameInput" placeholder="ex: PC Birou / Statie Randare">
         </div>
-        <button type="submit" class="auth-submit-btn">Salvează în Cont</button>
+        <button type="submit" class="auth-submit-btn">Asociază în Cont</button>
         <div id="claim-error" class="error-box"></div>
         <div id="claim-success" class="success-box"></div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Tutorial -->
+  <!-- Modal Tutorial / Ajutor (cu PowerShell Rapid + cURL) -->
   <div id="tutorial-modal" onclick="if(event.target===this)closeTutorial()">
     <div class="modal-box">
-      <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Cum obții cheia PC-ului?</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted);">
-        1. Pe PC-ul dorit, descarcă binarul standalone:
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div class="brand-icon" style="width: 36px; height: 36px; background: var(--grad-purple);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 800;">Ghid Conectare Dispozitiv</h3>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-dim); margin-bottom: 1rem;">
+        Pe calculatorul pe care dorești acces la distanță, alege metoda preferată de instalare:
       </p>
-      <pre>powershell -Command "$ProgressPreference='SilentlyContinue'; iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"</pre>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-        2. Instalează serviciul în fundal:
+
+      <!-- Opțiunea 1: PowerShell Rapid -->
+      <div style="font-size: 0.82rem; font-weight: 700; color: #ff6b00; text-transform: uppercase; margin-top: 0.75rem;">
+        Varianta 1: PowerShell (Descărcare Rapidă Buffer WebClient)
+      </div>
+      <div class="cmd-row">
+        <pre>powershell -NoProfile -ExecutionPolicy Bypass -Command "[System.Net.ServicePointManager]::SecurityProtocol=[System.Net.SecurityProtocolType]::Tls12;(New-Object System.Net.WebClient).DownloadFile('https://remote.hydraromania.ro/hydraremote.exe','hydraremote.exe')"; ./hydraremote.exe install</pre>
+        <button class="cmd-copy-floating" onclick="copyCliCommand(this, 'powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;[System.Net.ServicePointManager]::SecurityProtocol=[System.Net.SecurityProtocolType]::Tls12;(New-Object System.Net.WebClient).DownloadFile(\'https://remote.hydraromania.ro/hydraremote.exe\',\'hydraremote.exe\')&quot;; ./hydraremote.exe install')">Copiază</button>
+      </div>
+
+      <!-- Opțiunea 2: cURL -->
+      <div style="font-size: 0.82rem; font-weight: 700; color: #a855f7; text-transform: uppercase; margin-top: 0.75rem;">
+        Varianta 2: cURL (Windows 10/11 / Linux / macOS)
+      </div>
+      <div class="cmd-row">
+        <pre>curl -fsSL https://remote.hydraromania.ro/hydraremote.exe -o hydraremote.exe && ./hydraremote.exe install</pre>
+        <button class="cmd-copy-floating" onclick="copyCliCommand(this, 'curl -fsSL https://remote.hydraromania.ro/hydraremote.exe -o hydraremote.exe && ./hydraremote.exe install')">Copiază</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 1.1rem;">
+        Apoi afișează cheia secretă cu:
       </p>
-      <pre>./hydraremote.exe install</pre>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-        3. Afișează cheia secretă a PC-ului:
+      <div class="cmd-row">
+        <pre>hydraremote key</pre>
+        <button class="cmd-copy-floating" onclick="copyCliCommand(this, 'hydraremote key')">Copiază</button>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        Copiază cheia (începe cu <code>sk-</code>) și introdu-o în fereastra <b>„+ Adaugă PC cu Cheie SK”</b>.
       </p>
-      <pre>hydraremote key</pre>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-        Copiază cheia (începe cu <code>sk-</code>) și introdu-o în <b>„+ Adaugă PC cu Cheie SK”</b>.
-      </p>
+
       <button class="auth-submit-btn" onclick="closeTutorial()">Am înțeles</button>
     </div>
   </div>
@@ -735,11 +822,11 @@
   <!-- Dashboard Header -->
   <header>
     <div class="brand">
-      <div class="brand-logo">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       </div>
       <span>HydraREMOTE</span>
-      <span class="brand-badge">2026 Edition</span>
+      <span class="brand-badge">Control Hub</span>
     </div>
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">H</div>
@@ -752,34 +839,36 @@
   <main>
     <div class="top-bar">
       <div>
-        <h1 class="section-title">Computere la distanță</h1>
-        <p class="section-subtitle">Terminalele conectate la contul tău. Accesează-le securizat oricând.</p>
+        <h1 class="section-title">Terminalele Mele</h1>
+        <p class="section-subtitle">Conexiuni active, control la distanță de mare viteză cu latență ultra-redusă.</p>
       </div>
       <div class="btn-group">
         <button class="action-btn primary" onclick="openAddModal()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
           Adaugă PC cu Cheie SK
         </button>
         <button class="action-btn secondary" onclick="openTutorial()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          Ghid / Ajutor
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Ghid &amp; cURL
         </button>
       </div>
     </div>
 
     <div class="device-grid" id="devices-container">
-      <!-- Injected via JavaScript -->
+      <!-- Generat dinamic -->
     </div>
   </main>
 
   <!-- Modal Cerere de Aprobare -->
   <div id="consent-modal">
-    <div class="modal-box" style="text-align: center; max-width: 440px;">
-      <div style="font-size: 3rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">🔐</div>
-      <h3 id="consent-title" style="margin-bottom: 0.5rem; font-size: 1.3rem;">Aprobare Necesară</h3>
-      <p id="consent-msg" style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.75rem;">
-        Adresa ta de email nu este în lista pre-aprobată a acestui calculator.<br><br>
-        O notificare a fost trimisă pe ecranul gazdei. Se așteaptă aprobarea...
+    <div class="modal-box" style="text-align: center; max-width: 450px;">
+      <div style="width: 64px; height: 64px; border-radius: 20px; background: var(--grad-fire); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto; color: white; box-shadow: 0 0 25px rgba(255, 30, 66, 0.45);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3 id="consent-title" style="margin-bottom: 0.5rem; font-size: 1.4rem; font-weight: 800;">Aprobare Necesară</h3>
+      <p id="consent-msg" style="color: var(--text-dim); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.75rem;">
+        Adresa ta de email nu este în lista autorizată a acestui PC.<br><br>
+        O notificare a fost trimisă pe ecranul gazdei. Așteptare aprobare utilizator...
       </p>
       <div style="display: flex; justify-content: center;">
         <button class="action-btn secondary" onclick="cancelConnectRequest()">Anulează Solicitarea</button>
@@ -801,7 +890,7 @@
     async function copyCliCommand(btn, text) {
       navigator.clipboard.writeText(text).then(() => {
         const orig = btn.innerHTML;
-        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copiat!';
+        btn.innerHTML = 'Copiat!';
         setTimeout(() => { btn.innerHTML = orig; }, 2000);
       }).catch(err => {
         alert('Comandă: ' + text);
@@ -846,7 +935,7 @@
           });
           google.accounts.id.renderButton(slot, {
             type: 'standard',
-            theme: 'outline',
+            theme: 'filled_black',
             size: 'large',
             text: 'signin_with',
             shape: 'rectangular',
@@ -997,15 +1086,27 @@
       }
     }
 
+    function getPlatformIcon(platform) {
+      if (platform === 'win32') {
+        return `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.951"/></svg>`;
+      }
+      if (platform === 'darwin') {
+        return `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.7c.63-.78 1.07-1.85.95-2.92-1 .04-2.12.67-2.79 1.45-.58.68-1.1 1.77-.96 2.82 1.11.09 2.18-.57 2.8-1.35z"/></svg>`;
+      }
+      return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>`;
+    }
+
     function renderDevices(devices) {
       const container = document.getElementById('devices-container');
       if (devices.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <div class="empty-icon">💻</div>
-            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Niciun computer asociat</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">
-              Adaugă un PC folosind butonul <b>„+ Adaugă PC cu Cheie SK”</b>.
+            <div class="empty-icon">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+            </div>
+            <h3 style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">Niciun terminal asociat încă</h3>
+            <p style="color: var(--text-dim); font-size: 0.95rem; max-width: 460px; margin: 0 auto;">
+              Adaugă un PC rapid folosind butonul roșu-portocaliu <b>„+ Adaugă PC cu Cheie SK”</b>.
             </p>
           </div>
         `;
@@ -1014,45 +1115,45 @@
 
       container.innerHTML = devices.map(d => {
         const isOnline = d.isOnline;
-        const icon = d.platform === 'win32' ? '🪟' : (d.platform === 'darwin' ? '🍎' : '🐧');
+        const iconSvg = getPlatformIcon(d.platform);
 
         return `
           <div class="device-card">
             <div>
               <div class="device-header">
-                <div style="display: flex; align-items: center; gap: 0.85rem;">
-                  <div class="device-icon">${icon}</div>
+                <div style="display: flex; align-items: center; gap: 0.9rem;">
+                  <div class="device-icon-wrapper">${iconSvg}</div>
                   <div class="status-badge ${isOnline ? 'online' : 'offline'}">
                     ${isOnline ? 'Online' : 'Offline'}
                   </div>
                 </div>
                 <div class="device-actions-top">
                   <button class="btn-icon-sm" onclick="promptRename('${d.apiKey || d.id}', '${(d.name || '').replace(/'/g, "\\'")}')" title="Redenumește PC">
-                    ✏️
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                   </button>
                   <button class="btn-icon-sm delete" onclick="confirmDelete('${d.apiKey || d.id}', '${(d.name || '').replace(/'/g, "\\'")}')" title="Șterge PC">
-                    🗑️
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                   </button>
                 </div>
               </div>
               <div class="device-name">${d.name}</div>
               <div class="device-meta">
-                <div><span>Sistem:</span> <strong>${d.platform || 'Necunoscut'}</strong></div>
-                <div><span>IP Local:</span> <code>${d.localIp || '-'}</code></div>
-                <div><span>Ultimul semnal:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
-                <div><span>Cheie:</span> <code>${d.apiKey ? d.apiKey.substring(0, 8) + '...' : '-'}</code></div>
+                <div><span>Sistem de operare:</span> <strong style="color: #fff;">${d.platform || 'Necunoscut'}</strong></div>
+                <div><span>Adresă IP Local:</span> <code>${d.localIp || '-'}</code></div>
+                <div><span>Ultimul ping:</span> <strong style="color: #fff;">${formatTimeAgo(d.lastSeen)}</strong></div>
+                <div><span>Cheie asociată:</span> <code>${d.apiKey ? d.apiKey.substring(0, 8) + '...' : '-'}</code></div>
               </div>
             </div>
 
             <div style="margin-top: 1rem;">
               ${isOnline ? `
                 <button onclick="secureConnect('${d.sessionId}', '${d.apiKey}', '${(d.name || '').replace(/'/g, "\\'")}')" class="connect-btn">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                   Conectare Securizată
                 </button>
               ` : `
                 <button class="connect-btn disabled" disabled>
-                  Computer Offline
+                  Computer Deconectat
                 </button>
               `}
             </div>
