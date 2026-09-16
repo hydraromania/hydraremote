@@ -1197,7 +1197,8 @@
         }
 
         if (data.status === 'approved') {
-          window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
+          const finalKey = data.apiKey || apiKey;
+          window.location.href = `/login?k=${encodeURIComponent(finalKey)}`;
           return;
         }
 
@@ -1221,7 +1222,8 @@
               if (pollData.status === 'approved') {
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';
-                window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
+                const finalKey = pollData.apiKey || apiKey;
+                window.location.href = `/login?k=${encodeURIComponent(finalKey)}`;
               } else if (pollRes.status === 403 || pollData.status === 'rejected') {
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';
