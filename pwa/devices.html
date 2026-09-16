@@ -3,202 +3,249 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HydraREMOTE - Device Manager & Secure Access</title>
+  <title>HydraREMOTE - Control Center 2026</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: rgba(22, 29, 47, 0.85);
-      --card-border: rgba(59, 130, 246, 0.2);
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --accent-glow: rgba(59, 130, 246, 0.35);
+      --bg: #07090e;
+      --bg-surface: rgba(15, 23, 42, 0.65);
+      --bg-surface-hover: rgba(30, 41, 59, 0.8);
+      --card-border: rgba(148, 163, 184, 0.12);
+      --card-border-glow: rgba(56, 189, 248, 0.35);
+      --accent: #0ea5e9;
+      --accent-hover: #0284c7;
+      --accent-glow: rgba(14, 165, 233, 0.35);
+      --accent-grad: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --online: #10b981;
-      --online-glow: rgba(16, 185, 129, 0.4);
+      --online-glow: rgba(16, 185, 129, 0.35);
       --offline: #64748b;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --glass: blur(16px);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
     body {
-      background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg) 75%);
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, var(--bg) 65%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
     }
 
     header {
-      padding: 1rem 2rem;
+      padding: 1rem 2.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      background: rgba(9, 13, 22, 0.6);
+      backdrop-filter: var(--glass);
+      background: rgba(7, 9, 14, 0.75);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 50;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      font-weight: 700;
-      font-size: 1.25rem;
+      gap: 0.85rem;
+      font-weight: 800;
+      font-size: 1.3rem;
       letter-spacing: -0.5px;
       color: #fff;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .brand-badge {
       font-size: 0.65rem;
       text-transform: uppercase;
-      background: var(--accent);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      color: #38bdf8;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
     }
 
     .user-pill {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 0.35rem 0.85rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.4rem 0.95rem;
       border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       font-size: 0.85rem;
+      backdrop-filter: blur(8px);
     }
 
     .user-avatar {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--accent-grad);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 0.75rem;
-      overflow: hidden;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: white;
     }
 
     .logout-btn {
       background: none;
       border: none;
-      color: #ef4444;
+      color: #f87171;
       cursor: pointer;
       font-weight: 600;
       font-size: 0.8rem;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
     }
     .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.1);
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
     }
 
     main {
       flex: 1;
-      max-width: 1100px;
+      max-width: 1240px;
       width: 100%;
       margin: 0 auto;
-      padding: 2.5rem 1.5rem;
+      padding: 3rem 2rem;
+      position: relative;
+      z-index: 1;
     }
 
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
     .section-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.35rem;
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.7px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
     }
 
     .section-subtitle {
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
 
     .btn-group {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.85rem;
       flex-wrap: wrap;
     }
 
     .action-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.65rem 1.1rem;
-      border-radius: 10px;
-      font-size: 0.85rem;
+      gap: 0.55rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .action-btn.primary {
-      background: var(--accent);
+      background: var(--accent-grad);
       color: white;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px var(--accent-glow);
     }
     .action-btn.primary:hover {
-      background: var(--accent-hover);
-      box-shadow: 0 4px 15px var(--accent-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(14, 165, 233, 0.5);
     }
 
     .action-btn.secondary {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid var(--card-border);
-      color: #93c5fd;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      backdrop-filter: blur(8px);
     }
     .action-btn.secondary:hover {
-      background: rgba(59, 130, 246, 0.3);
-      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
     }
 
     /* Device Grid */
     .device-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.75rem;
     }
 
     .device-card {
-      background: var(--card-bg);
+      background: var(--bg-surface);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 1.65rem;
+      box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.4);
+      backdrop-filter: var(--glass);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
     }
 
     .device-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(59, 130, 246, 0.5);
-      box-shadow: 0 15px 30px -5px var(--accent-glow);
+      transform: translateY(-4px);
+      border-color: var(--card-border-glow);
+      box-shadow: 0 20px 40px -8px var(--accent-glow);
+      background: var(--bg-surface-hover);
     }
 
     .device-header {
@@ -209,11 +256,11 @@
     }
 
     .device-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid rgba(14, 165, 233, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -224,19 +271,19 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 9999px;
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
 
     .status-badge.online {
       background: rgba(16, 185, 129, 0.15);
       color: #34d399;
       border: 1px solid rgba(16, 185, 129, 0.3);
-      box-shadow: 0 0 12px var(--online-glow);
+      box-shadow: 0 0 14px var(--online-glow);
     }
 
     .status-badge.online::before {
@@ -252,7 +299,7 @@
     .status-badge.offline {
       background: rgba(100, 116, 139, 0.15);
       color: #94a3b8;
-      border: 1px solid rgba(100, 116, 139, 0.3);
+      border: 1px solid rgba(100, 116, 139, 0.25);
     }
 
     .status-badge.offline::before {
@@ -265,55 +312,110 @@
 
     @keyframes pulse {
       0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(0.95); opacity: 0.8; }
     }
 
     .device-name {
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.4rem;
       word-break: break-all;
+      letter-spacing: -0.3px;
     }
 
     .device-meta {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.85rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .device-meta div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .device-meta code {
+      font-family: 'JetBrains Mono', monospace;
+      color: #38bdf8;
+      background: rgba(14, 165, 233, 0.1);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 0.78rem;
     }
 
     .connect-btn {
       width: 100%;
-      padding: 0.8rem 1rem;
-      background: var(--accent);
+      padding: 0.85rem 1.25rem;
+      background: var(--accent-grad);
       color: white;
       border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.9rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 16px var(--accent-glow);
     }
 
     .connect-btn:hover {
-      background: var(--accent-hover);
-      box-shadow: 0 4px 12px var(--accent-glow);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+      transform: translateY(-2px);
     }
 
     .connect-btn.disabled {
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-muted);
       cursor: not-allowed;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .device-actions-top {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .btn-icon-sm {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-icon-sm:hover {
+      background: rgba(14, 165, 233, 0.15);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-icon-sm.delete:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border-color: #ef4444;
     }
 
     /* Modal / Auth View */
@@ -321,8 +423,8 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.97);
-      backdrop-filter: blur(16px);
+      background: rgba(7, 9, 14, 0.85);
+      backdrop-filter: blur(20px);
       z-index: 100;
       align-items: center;
       justify-content: center;
@@ -330,55 +432,53 @@
     }
 
     .auth-card {
-      background: #131b2e;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 2.5rem;
-      border-radius: 20px;
-      max-width: 440px;
+      background: #0f172a;
+      border: 1px solid var(--card-border-glow);
+      padding: 2.75rem 2.25rem;
+      border-radius: 24px;
+      max-width: 460px;
       width: 100%;
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
       text-align: center;
     }
 
     .auth-title {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.6rem;
+      font-weight: 800;
       margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
     }
 
     .auth-subtitle {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       margin-bottom: 1.75rem;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .google-btn-slot {
       display: flex;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       min-height: 46px;
     }
 
-    
-    /* CLI Quick Install snippet */
     .cli-install-box {
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 12px;
-      padding: 0.85rem 1rem;
+      border-radius: 14px;
+      padding: 1rem;
       margin: 1.25rem 0 1.5rem 0;
       text-align: left;
-      position: relative;
     }
     .cli-install-box .cli-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
     }
     .cli-install-box .cli-title {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
@@ -391,9 +491,9 @@
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
       color: #38bdf8;
-      padding: 0.25rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.72rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 7px;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -407,34 +507,16 @@
     }
     .cli-install-box code {
       display: block;
-      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
       color: #f1f5f9;
-      background: #090d16;
-      padding: 0.6rem 0.75rem;
-      border-radius: 7px;
+      background: #07090e;
+      padding: 0.75rem;
+      border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       user-select: all;
       overflow-x: auto;
       white-space: nowrap;
-    }
-.divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      margin: 1.5rem 0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .divider span {
-      padding: 0 10px;
     }
 
     .input-group {
@@ -444,85 +526,89 @@
 
     .input-group label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
       color: #cbd5e1;
     }
 
     .input-group input {
       width: 100%;
-      padding: 0.8rem 1rem;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
       color: white;
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s ease;
     }
 
     .input-group input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
     .auth-submit-btn {
       width: 100%;
-      padding: 0.8rem;
-      background: var(--accent);
+      padding: 0.85rem;
+      background: var(--accent-grad);
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       color: white;
       font-weight: 700;
       font-size: 0.95rem;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px var(--accent-glow);
     }
 
     .auth-submit-btn:hover {
-      background: var(--accent-hover);
-      box-shadow: 0 4px 15px var(--accent-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
     }
 
-    /* Modal Add Device by Key */
-    #add-device-modal, #tutorial-modal {
+    /* Modal Add Device by Key / Tutorial */
+    #add-device-modal, #tutorial-modal, #consent-modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
+      background: rgba(7, 9, 14, 0.85);
+      backdrop-filter: blur(16px);
       z-index: 110;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
     }
+
     .modal-box {
-      background: #131b2e;
+      background: #0f172a;
       border: 1px solid var(--card-border);
-      padding: 2.25rem;
-      border-radius: 18px;
-      max-width: 480px;
+      padding: 2.5rem;
+      border-radius: 24px;
+      max-width: 500px;
       width: 100%;
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
     }
 
     .modal-box pre {
-      background: #090d16;
-      padding: 1rem;
-      border-radius: 8px;
+      background: #07090e;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
       color: #38bdf8;
-      font-family: monospace;
-      margin: 1rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      margin: 0.85rem 0;
       overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .error-box {
       color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
+      background: rgba(239, 68, 68, 0.12);
       border: 1px solid rgba(239, 68, 68, 0.25);
-      padding: 0.75rem;
-      border-radius: 8px;
+      padding: 0.85rem;
+      border-radius: 10px;
       font-size: 0.85rem;
       margin-top: 1rem;
       display: none;
@@ -530,10 +616,10 @@
 
     .success-box {
       color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.12);
       border: 1px solid rgba(16, 185, 129, 0.25);
-      padding: 0.75rem;
-      border-radius: 8px;
+      padding: 0.85rem;
+      border-radius: 10px;
       font-size: 0.85rem;
       margin-top: 1rem;
       display: none;
@@ -542,102 +628,69 @@
     /* Empty state */
     .empty-state {
       text-align: center;
-      padding: 4rem 2rem;
-      background: rgba(22, 29, 47, 0.4);
-      border: 1px dashed rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
+      padding: 5rem 2rem;
+      background: var(--bg-surface);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
       grid-column: 1 / -1;
     }
     .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 3.5rem;
+      margin-bottom: 1.25rem;
     }
-  
-    .device-actions-top {
-      display: flex;
-      gap: 0.4rem;
-      align-items: center;
-    }
-
-    .btn-icon-sm {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-muted);
-      border-radius: 6px;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .btn-icon-sm:hover {
-      background: rgba(59, 130, 246, 0.2);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    .btn-icon-sm.delete:hover {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
-      border-color: #ef4444;
-    }
-</style>
+  </style>
 </head>
 <body>
 
-  <!-- Auth Screen Modal (Doar Google OAuth sau Token Dispozitiv) -->
+  <!-- Auth Screen Modal -->
   <div id="auth-view">
     <div class="auth-card">
-      <div class="brand" style="justify-content: center; margin-bottom: 1rem;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+      <div class="brand" style="justify-content: center; margin-bottom: 1.25rem;">
+        <div class="brand-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+        </div>
         <span>HydraREMOTE</span>
         <span class="brand-badge">Google Auth</span>
       </div>
       <h2 class="auth-title">Autentificare Securizată</h2>
-      <p class="auth-subtitle">Selectează contul tău Google pentru a încărca exclusiv terminalele și calculatoarele asociate ție.</p>
+      <p class="auth-subtitle">Selectează contul Google pentru acces la terminalele asociate.</p>
       
-      <!-- Comanda instalare CLI -->
+      <!-- CLI Quick Install snippet -->
       <div class="cli-install-box">
         <div class="cli-header">
           <span class="cli-title">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
             Instalare pe PC / Server
           </span>
-          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'powershell -Command &quot;iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe&quot;; ./hydraremote.exe install')">
+          <button type="button" class="cli-copy-btn" onclick="copyCliCommand(this, 'powershell -Command &quot;$ProgressPreference=\'SilentlyContinue\'; iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe&quot;; ./hydraremote.exe install')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             Copiază
           </button>
         </div>
-        <code>powershell -Command "iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"; ./hydraremote.exe install</code>
+        <code>powershell -Command "$ProgressPreference='SilentlyContinue'; iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"; ./hydraremote.exe install</code>
       </div>
-      <div style="margin-top: 0.75rem;">
-        <a href="/hydraremote.exe" style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.85rem;">
+      <div style="margin-top: 0.75rem; margin-bottom: 1.25rem;">
+        <a href="/hydraremote.exe" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 0.6rem 1rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.85rem; transition: all 0.2s ease;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descarcă HydraREMOTE.exe (Windows Standalone)
+          Descarcă HydraREMOTE.exe
         </a>
       </div>
 
       <!-- Google Sign-In button container -->
       <div class="google-btn-slot" id="google-btn-slot"></div>
-
-      
-
       <div id="auth-error-box" class="error-box"></div>
     </div>
   </div>
 
-  <!-- Modal Adaugă Dispozitiv prin Cheie SK (Salvat direct pe Cont) -->
+  <!-- Modal Adaugă Dispozitiv prin Cheie SK -->
   <div id="add-device-modal" onclick="if(event.target===this)closeAddModal()">
     <div class="modal-box">
-      <div class="brand" style="margin-bottom: 1rem;">
+      <div class="brand" style="margin-bottom: 1.25rem;">
         <span>Adaugă PC în Cont</span>
-        <span class="brand-badge" style="background: #10b981;">Secret Key</span>
+        <span class="brand-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">Secret Key</span>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-        Introdu cheia permanentă (generată de comanda <code>hydraremote key</code> pe PC). Calculatorul va fi legat automat de contul tău!
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5;">
+        Introdu cheia permanentă (generată de comanda <code>hydraremote key</code> pe PC). Calculatorul va fi legat automat de contul tău.
       </p>
 
       <form onsubmit="handleClaimDevice(event)">
@@ -647,9 +700,9 @@
         </div>
         <div class="input-group">
           <label for="claimNameInput">Nume Personalizat (opțional):</label>
-          <input type="text" id="claimNameInput" placeholder="ex: Calculator Birou / PC Acasă">
+          <input type="text" id="claimNameInput" placeholder="ex: Calculator Birou / Server Producție">
         </div>
-        <button type="submit" class="auth-submit-btn">Salvează în Contul Meu</button>
+        <button type="submit" class="auth-submit-btn">Salvează în Cont</button>
         <div id="claim-error" class="error-box"></div>
         <div id="claim-success" class="success-box"></div>
       </form>
@@ -659,21 +712,21 @@
   <!-- Modal Tutorial -->
   <div id="tutorial-modal" onclick="if(event.target===this)closeTutorial()">
     <div class="modal-box">
-      <h3 style="margin-bottom: 0.5rem;">Cum afli cheia PC-ului?</h3>
+      <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Cum obții cheia PC-ului?</h3>
       <p style="font-size: 0.85rem; color: var(--text-muted);">
-        1. Pe calculatorul pe care dorești accesul la distanță, descarcă binarul (fără Node.js / npm):
+        1. Pe PC-ul dorit, descarcă binarul standalone:
       </p>
-      <pre style="margin-top: 0.5rem;">powershell -Command "iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"</pre>
+      <pre>powershell -Command "$ProgressPreference='SilentlyContinue'; iwr https://remote.hydraromania.ro/hydraremote.exe -OutFile hydraremote.exe"</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-        Porneste serviciul in fundal (merge pe Windows XP → 11):
+        2. Instalează serviciul în fundal:
       </p>
-      <pre style="margin-top: 0.5rem;">./hydraremote.exe install</pre>
+      <pre>./hydraremote.exe install</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-        2. Generează cheia secretă a PC-ului:
+        3. Afișează cheia secretă a PC-ului:
       </p>
-      <pre style="margin-top: 0.5rem;">hydraremote key</pre>
+      <pre>hydraremote key</pre>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-        Copiază cheia secretă afișată (începe cu <code>sk-</code>) și introdu-o în fereastra <b>„+ Adaugă PC cu Cheie SK”</b>.
+        Copiază cheia (începe cu <code>sk-</code>) și introdu-o în <b>„+ Adaugă PC cu Cheie SK”</b>.
       </p>
       <button class="auth-submit-btn" onclick="closeTutorial()">Am înțeles</button>
     </div>
@@ -682,9 +735,11 @@
   <!-- Dashboard Header -->
   <header>
     <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+      <div class="brand-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+      </div>
       <span>HydraREMOTE</span>
-      <span class="brand-badge">Remote Desktop</span>
+      <span class="brand-badge">2026 Edition</span>
     </div>
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">H</div>
@@ -698,7 +753,7 @@
     <div class="top-bar">
       <div>
         <h1 class="section-title">Computere la distanță</h1>
-        <p class="section-subtitle">Terminalele conectate la contul tău Google. Accesează-le instant de pe mobil sau alt PC.</p>
+        <p class="section-subtitle">Terminalele conectate la contul tău. Accesează-le securizat oricând.</p>
       </div>
       <div class="btn-group">
         <button class="action-btn primary" onclick="openAddModal()">
@@ -717,6 +772,21 @@
     </div>
   </main>
 
+  <!-- Modal Cerere de Aprobare -->
+  <div id="consent-modal">
+    <div class="modal-box" style="text-align: center; max-width: 440px;">
+      <div style="font-size: 3rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">🔐</div>
+      <h3 id="consent-title" style="margin-bottom: 0.5rem; font-size: 1.3rem;">Aprobare Necesară</h3>
+      <p id="consent-msg" style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.75rem;">
+        Adresa ta de email nu este în lista pre-aprobată a acestui calculator.<br><br>
+        O notificare a fost trimisă pe ecranul gazdei. Se așteaptă aprobarea...
+      </p>
+      <div style="display: flex; justify-content: center;">
+        <button class="action-btn secondary" onclick="cancelConnectRequest()">Anulează Solicitarea</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = window.location.origin;
     let activeGoogleClientId = '';
@@ -724,7 +794,8 @@
     function getAuth() {
       const googleToken = localStorage.getItem('hydra_google_token');
       const googleEmail = localStorage.getItem('hydra_google_email');
-      return { googleToken, googleEmail };
+      const apiKey = localStorage.getItem('hydra_device_token');
+      return { googleToken, googleEmail, apiKey };
     }
 
     async function copyCliCommand(btn, text) {
@@ -816,18 +887,6 @@
       }
     }
 
-    function handleTokenLogin(e) {
-      e.preventDefault();
-      const token = document.getElementById('tokenInput').value.trim();
-      if (!token) return;
-
-      localStorage.setItem('hydra_device_token', token);
-      localStorage.removeItem('hydra_google_token');
-      localStorage.removeItem('hydra_google_email');
-      document.getElementById('auth-view').style.display = 'none';
-      initAuth();
-    }
-
     function openAddModal() {
       document.getElementById('claim-error').style.display = 'none';
       document.getElementById('claim-success').style.display = 'none';
@@ -849,7 +908,7 @@
       succBox.style.display = 'none';
 
       if (!googleToken) {
-        errBox.textContent = 'Trebuie să fii autentificat cu Google pentru a asocia calculatoare la cont.';
+        errBox.textContent = 'Trebuie să fii autentificat cu Google pentru a asocia calculatoare.';
         errBox.style.display = 'block';
         return;
       }
@@ -866,7 +925,7 @@
         const data = await res.json();
 
         if (res.ok && data.success) {
-          succBox.textContent = 'Computerul a fost asociat cu succes la contul tău!';
+          succBox.textContent = 'Computer asociat cu succes!';
           succBox.style.display = 'block';
           setTimeout(() => {
             closeAddModal();
@@ -877,7 +936,7 @@
           errBox.style.display = 'block';
         }
       } catch (err) {
-        errBox.textContent = 'Eroare de rețea la asocierea dispozitivului.';
+        errBox.textContent = 'Eroare de rețea la asociere.';
         errBox.style.display = 'block';
       }
     }
@@ -908,9 +967,9 @@
       if (!timestamp) return 'Niciodată';
       const seconds = Math.floor((Date.now() - timestamp) / 1000);
       if (seconds < 20) return 'Chiar acum';
-      if (seconds < 60) return `acum ${seconds} secunde`;
+      if (seconds < 60) return `acum ${seconds} sec`;
       const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `acum ${minutes} minute`;
+      if (minutes < 60) return `acum ${minutes} min`;
       const hours = Math.floor(minutes / 60);
       if (hours < 24) return `acum ${hours} ore`;
       const days = Math.floor(hours / 24);
@@ -934,7 +993,7 @@
         const data = await res.json();
         renderDevices(data.devices || []);
       } catch (err) {
-        console.error('Eroare la încărcarea dispozitivelor:', err);
+        console.error('Eroare la încărcare dispozitive:', err);
       }
     }
 
@@ -944,9 +1003,9 @@
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">💻</div>
-            <h3>Niciun computer asociat încă</h3>
-            <p style="color: var(--text-muted); margin-top: 0.6rem; max-width: 480px; margin-left: auto; margin-right: auto;">
-              Poți adăuga un PC instant folosind butonul albastru de sus <b>„+ Adaugă PC cu Cheie SK”</b>.
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Niciun computer asociat</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+              Adaugă un PC folosind butonul <b>„+ Adaugă PC cu Cheie SK”</b>.
             </p>
           </div>
         `;
@@ -956,23 +1015,22 @@
       container.innerHTML = devices.map(d => {
         const isOnline = d.isOnline;
         const icon = d.platform === 'win32' ? '🪟' : (d.platform === 'darwin' ? '🍎' : '🐧');
-        const connectUrl = `/login?autoConnect=1&session=${encodeURIComponent(d.sessionId)}&key=${encodeURIComponent(d.apiKey)}`;
 
         return `
           <div class="device-card">
             <div>
               <div class="device-header">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
                   <div class="device-icon">${icon}</div>
                   <div class="status-badge ${isOnline ? 'online' : 'offline'}">
                     ${isOnline ? 'Online' : 'Offline'}
                   </div>
                 </div>
                 <div class="device-actions-top">
-                  <button class="btn-icon-sm" onclick="promptRename('${d.apiKey || d.id}', '${d.name.replace(/'/g, "\\'")}')" title="Redenumește PC">
-                    ✏️ Modifică
+                  <button class="btn-icon-sm" onclick="promptRename('${d.apiKey || d.id}', '${(d.name || '').replace(/'/g, "\\'")}')" title="Redenumește PC">
+                    ✏️
                   </button>
-                  <button class="btn-icon-sm delete" onclick="confirmDelete('${d.apiKey || d.id}', '${d.name.replace(/'/g, "\\'")}')" title="Șterge PC">
+                  <button class="btn-icon-sm delete" onclick="confirmDelete('${d.apiKey || d.id}', '${(d.name || '').replace(/'/g, "\\'")}')" title="Șterge PC">
                     🗑️
                   </button>
                 </div>
@@ -980,15 +1038,15 @@
               <div class="device-name">${d.name}</div>
               <div class="device-meta">
                 <div><span>Sistem:</span> <strong>${d.platform || 'Necunoscut'}</strong></div>
-                <div><span>Local IP:</span> <code>${d.localIp || '-'}</code></div>
-                <div><span>Ultima activitate:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
+                <div><span>IP Local:</span> <code>${d.localIp || '-'}</code></div>
+                <div><span>Ultimul semnal:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
                 <div><span>Cheie:</span> <code>${d.apiKey ? d.apiKey.substring(0, 8) + '...' : '-'}</code></div>
               </div>
             </div>
 
-            <div>
+            <div style="margin-top: 1rem;">
               ${isOnline ? `
-                <button onclick="secureConnect('${d.sessionId}', '${d.apiKey}', '${d.name}')" class="connect-btn" style="cursor: pointer;">
+                <button onclick="secureConnect('${d.sessionId}', '${d.apiKey}', '${(d.name || '').replace(/'/g, "\\'")}')" class="connect-btn">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                   Conectare Securizată
                 </button>
@@ -1003,10 +1061,6 @@
       }).join('');
     }
 
-    // Inițializare & Polling
-    initAuth();
-    setInterval(loadDevices, 4000);
-  
     let activePollTimer = null;
 
     async function secureConnect(sessionId, apiKey, devName) {
@@ -1035,15 +1089,13 @@
         }
 
         if (data.status === 'approved') {
-          // Utilizatorul este Owner sau Whitelisted -> Acces Direct
           window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
           return;
         }
 
         if (data.status === 'pending_approval') {
-          // Afișăm modalul AnyDesk / Google Remote Desktop
-          title.textContent = `Aprobare Cerută: ${devName}`;
-          msg.innerHTML = `Notificare trimisă pe ecranul <b>${devName}</b>.<br><br>Se așteaptă aprobarea utilizatorului local...`;
+          title.textContent = `Aprobare: ${devName}`;
+          msg.innerHTML = `Notificare trimisă pe <b>${devName}</b>.<br><br>Așteptare confirmare utilizator local...`;
           modal.style.display = 'flex';
 
           const reqId = data.requestId;
@@ -1065,13 +1117,13 @@
               } else if (pollRes.status === 403 || pollData.status === 'rejected') {
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';
-                alert('❌ Conexiunea a fost REFUZATĂ de utilizatorul de la PC.');
+                alert('❌ Conexiune refuzată pe calculator.');
               }
             } catch (e) {}
           }, 2000);
         }
       } catch (err) {
-        alert('Eroare de rețea la inițierea conexiunii');
+        alert('Eroare rețea la inițiere conexiune');
       }
     }
 
@@ -1080,9 +1132,8 @@
       document.getElementById('consent-modal').style.display = 'none';
     }
 
-
     async function promptRename(targetId, currentName) {
-      const newName = prompt('Introdu noul nume pentru acest calculator:', currentName);
+      const newName = prompt('Nume nou calculator:', currentName);
       if (!newName || !newName.trim() || newName.trim() === currentName) return;
 
       const { googleToken } = getAuth();
@@ -1104,9 +1155,7 @@
     }
 
     async function confirmDelete(targetId, name) {
-      if (!confirm(`Sigur dorești să ștergi calculatorul "${name}" din lista contului tău?`)) {
-        return;
-      }
+      if (!confirm(`Ștergi calculatorul "${name}" din listă?`)) return;
 
       const { googleToken } = getAuth();
       try {
@@ -1126,22 +1175,8 @@
       }
     }
 
-</script>
-
-  <!-- Modal Cerere de Aprobare (Google Remote / AnyDesk style) -->
-  <div id="consent-modal" class="modal-overlay" style="display: none; z-index: 9999;">
-    <div class="modal" style="text-align: center; max-width: 440px;">
-      <div style="font-size: 3rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">🔐</div>
-      <h3 id="consent-title" style="margin-bottom: 0.5rem;">Aprobare Necesară</h3>
-      <p id="consent-msg" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
-        Adresa ta de email nu se află în lista pre-aprobată a acestui calculator.<br><br>
-        O notificare de securitate a fost trimisă direct pe ecranul PC-ului gazdă. Te rugăm să aștepți ca utilizatorul să apese <b>„Acceptă”</b>.
-      </p>
-      <div style="display: flex; justify-content: center; gap: 0.5rem;">
-        <button class="btn btn-secondary" onclick="cancelConnectRequest()">Anulează Solicitarea</button>
-      </div>
-    </div>
-  </div>
-
+    initAuth();
+    setInterval(loadDevices, 4000);
+  </script>
 </body>
 </html>
