@@ -303,11 +303,12 @@ app.post('/api/connect', antiBruteForce, async (req, res) => {
     if (payload) requesterEmail = payload.email.toLowerCase();
   }
 
-  // Verificăm dacă emailul este aprobat direct (Owner sau Whitelist)
+  // Verificăm dacă cheia secretă este trimisă direct sau dacă emailul este aprobat (Owner / Whitelist)
+  const isDirectKeyAuth = targetDev.apiKey && key === targetDev.apiKey;
   const isOwner = targetDev.userEmail && requesterEmail && targetDev.userEmail === requesterEmail;
   const isAllowed = targetDev.allowedEmails && requesterEmail && targetDev.allowedEmails.includes(requesterEmail);
 
-  if (isOwner || isAllowed) {
+  if (isDirectKeyAuth || isOwner || isAllowed) {
     resetFailedAttempts(ip);
     return res.json({
       success: true,
@@ -704,8 +705,8 @@ app.get('/devices', (req, res) => {
   res.redirect('/');
 });
 
-// Pagina de conectare terminal (Next.js PWA)
-app.get('/login', (req, res) => {
+// Pagina de conectare terminal & workspace (Next.js PWA)
+app.get(/^\/(login|workspace).*/, (req, res) => {
   res.sendFile(path.join(PWA_DIR, 'index.html'));
 });
 

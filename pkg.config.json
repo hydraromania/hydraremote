@@ -1,0 +1,4 @@
+{
+  "scripts": ["cli/dist/cli.cjs", "cli/dist/server.cjs"],
+  "assets": ["cli/dist/assets/**/*", "cli/dist/ui/**/*", "cli/dist/bin/**/*"]
+}
