@@ -221,7 +221,7 @@ app.post('/api/session/create', (req, res) => {
 });
 
 app.post('/api/session/update', (req, res) => {
-  const { sessionId, apiKey, tunnelUrl, localIp, hostname, platform, userEmail } = req.body;
+  const { sessionId, apiKey, tunnelUrl, localIp, publicIp, hostname, platform, userEmail } = req.body;
   const now = Date.now();
   const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : null;
 
@@ -259,6 +259,7 @@ app.post('/api/session/update', (req, res) => {
     platform: platform || existing.platform || 'windows',
     tunnelUrl: tunnelUrl || existing.tunnelUrl || '',
     localIp: localIp || existing.localIp || '',
+    publicIp: publicIp || existing.publicIp || '',
     lastSeen: now,
     createdAt: existing.createdAt || now
   });
@@ -632,6 +633,7 @@ app.get('/api/devices', async (req, res) => {
     platform: d.platform,
     tunnelUrl: d.tunnelUrl,
     localIp: d.localIp,
+    publicIp: d.publicIp || '',
     lastSeen: d.lastSeen,
     userEmail: d.userEmail || null,
     allowedEmails: d.allowedEmails || (d.userEmail ? [d.userEmail] : []),
@@ -707,7 +709,7 @@ app.get('/devices', (req, res) => {
 
 // Pagina de conectare terminal & workspace (Next.js PWA)
 app.get(/^\/(login|workspace).*/, (req, res) => {
-  res.sendFile(path.join(PWA_DIR, 'index.html'));
+  res.sendFile(path.join(PWA_DIR, 'terminal.html'));
 });
 
 // Servire fișiere statice PWA (css, js, assets)

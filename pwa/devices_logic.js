@@ -262,6 +262,7 @@
               <div class="device-meta">
                 <div><span>Sistem:</span> <strong>${d.platform || 'Necunoscut'}</strong></div>
                 <div><span>Local IP:</span> <code>${d.localIp || '-'}</code></div>
+                <div><span>IP Internet:</span> <code>${d.publicIp || '...'}</code></div>
                 <div><span>Ultima activitate:</span> <strong>${formatTimeAgo(d.lastSeen)}</strong></div>
                 <div><span>Cheie:</span> <code>${d.apiKey ? d.apiKey.substring(0, 8) + '...' : '-'}</code></div>
               </div>
@@ -317,7 +318,8 @@
 
         if (data.status === 'approved') {
           // Utilizatorul este Owner sau Whitelisted -> Acces Direct
-          window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
+          const finalKey = data.apiKey || apiKey;
+          window.location.href = `/login?k=${encodeURIComponent(finalKey)}`;
           return;
         }
 
@@ -342,7 +344,8 @@
               if (pollData.status === 'approved') {
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';
-                window.location.href = `/login?autoConnect=1&session=${encodeURIComponent(sessionId)}&key=${encodeURIComponent(apiKey)}`;
+                const finalKey = pollData.apiKey || apiKey;
+                window.location.href = `/login?k=${encodeURIComponent(finalKey)}`;
               } else if (pollRes.status === 403 || pollData.status === 'rejected') {
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';

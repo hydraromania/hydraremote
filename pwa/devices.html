@@ -592,7 +592,7 @@
     }
 
     /* Modals */
-    #add-device-modal, #tutorial-modal, #consent-modal {
+    #add-device-modal, #tutorial-modal, #consent-modal, #mode-select-modal {
       display: none;
       position: fixed;
       inset: 0;
@@ -602,6 +602,56 @@
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+    }
+
+    .mode-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 640px) {
+      .mode-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .mode-card-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      color: #fff;
+    }
+    .mode-card-btn:hover {
+      background: rgba(255, 107, 0, 0.12);
+      border-color: rgba(255, 107, 0, 0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(255, 107, 0, 0.25);
+    }
+    .mode-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mode-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .mode-desc {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.35;
     }
 
     .modal-box {
@@ -865,6 +915,47 @@
       <!-- Generat dinamic -->
     </div>
   </main>
+
+  <!-- Modal Selectare Tip Conexiune (Remote Desktop / Files / Terminal) -->
+  <div id="mode-select-modal" onclick="if(event.target===this)closeModeModal()">
+    <div class="modal-box" style="max-width: 680px; text-align: center;">
+      <h3 id="mode-modal-device-name" style="margin-bottom: 0.4rem; font-size: 1.5rem; font-weight: 800; color: #fff;">Conectare Dispozitiv</h3>
+      <p style="color: var(--text-dim); font-size: 0.9rem;">Alege modul în care dorești să controlezi acest PC:</p>
+
+      <div class="mode-cards-grid">
+        <!-- Remote Desktop -->
+        <div class="mode-card-btn" onclick="launchConnectionMode('desktop')">
+          <div class="mode-icon" style="background: rgba(255, 107, 0, 0.15); color: #ff9800; border: 1px solid rgba(255, 107, 0, 0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          </div>
+          <div class="mode-title">Remote Desktop</div>
+          <div class="mode-desc">Vezi ecranul live și controlează PC-ul complet cu mouse și tastatură.</div>
+        </div>
+
+        <!-- File Explorer -->
+        <div class="mode-card-btn" onclick="launchConnectionMode('files')">
+          <div class="mode-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          </div>
+          <div class="mode-title">Files & Transfer</div>
+          <div class="mode-desc">Explorează fișierele, descarcă și încarcă documente direct.</div>
+        </div>
+
+        <!-- Terminal PTY -->
+        <div class="mode-card-btn" onclick="launchConnectionMode('terminal')">
+          <div class="mode-icon" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+          </div>
+          <div class="mode-title">Terminal</div>
+          <div class="mode-desc">Acces linie de comandă (PowerShell / CMD / Bash) de la distanță.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <button class="action-btn secondary" onclick="closeModeModal()">Închide</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Cerere de Aprobare -->
   <div id="consent-modal">
@@ -1147,6 +1238,7 @@
               <div class="device-meta">
                 <div><span>Sistem de operare:</span> <strong style="color: #fff;">${d.platform || 'Necunoscut'}</strong></div>
                 <div><span>Adresă IP Local:</span> <code>${d.localIp || '-'}</code></div>
+                <div><span>IP Internet:</span> <code>${d.publicIp || '...'}</code></div>
                 <div><span>Ultimul ping:</span> <strong style="color: #fff;">${formatTimeAgo(d.lastSeen)}</strong></div>
                 <div><span>Cheie asociată:</span> <code>${d.apiKey ? d.apiKey.substring(0, 8) + '...' : '-'}</code></div>
               </div>
@@ -1170,6 +1262,25 @@
     }
 
     let activePollTimer = null;
+    let pendingConnectionKey = null;
+
+    function openModeModal(apiKey, devName) {
+      pendingConnectionKey = apiKey;
+      document.getElementById('mode-modal-device-name').textContent = devName || 'Conectare PC';
+      document.getElementById('mode-select-modal').style.display = 'flex';
+    }
+
+    function closeModeModal() {
+      document.getElementById('mode-select-modal').style.display = 'none';
+      pendingConnectionKey = null;
+    }
+
+    function launchConnectionMode(mode) {
+      if (!pendingConnectionKey) return;
+      const k = encodeURIComponent(pendingConnectionKey);
+      closeModeModal();
+      window.location.href = `/workspace?k=${k}&mode=${mode}#${mode}`;
+    }
 
     async function secureConnect(sessionId, apiKey, devName) {
       const { googleToken } = getAuth();
@@ -1198,7 +1309,7 @@
 
         if (data.status === 'approved') {
           const finalKey = data.apiKey || apiKey;
-          window.location.href = `/login?k=${encodeURIComponent(finalKey)}`;
+          openModeModal(finalKey, devName);
           return;
         }
 
@@ -1223,7 +1334,7 @@
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';
                 const finalKey = pollData.apiKey || apiKey;
-                window.location.href = `/login?k=${encodeURIComponent(finalKey)}`;
+                openModeModal(finalKey, devName);
               } else if (pollRes.status === 403 || pollData.status === 'rejected') {
                 clearInterval(activePollTimer);
                 modal.style.display = 'none';
