@@ -217,6 +217,12 @@ QR expires in 30 minutes (one-time use)
   const os = require('os');
   let startTime = Date.now();
 
+  let __pubIp = null, __pubIpAt = 0;
+  const getPublicIpSync = () => {
+    if (__pubIp && Date.now() - __pubIpAt < 300000) return __pubIp;
+    try { fetch("https://api.ipify.org?format=json", { signal: AbortSignal.timeout(3000) }).then(r => r.json()).then(j => { if (j && j.ip) { __pubIp = j.ip; __pubIpAt = Date.now(); } }).catch(() => {}); } catch (e) {}
+    return __pubIp || "";
+  };
   const sendHeartbeat = () => {
     const curTunnel = (o && o.current && o.current.tunnelUrl) ? o.current.tunnelUrl : (t || '');
     try {
@@ -227,6 +233,7 @@ QR expires in 30 minutes (one-time use)
           apiKey: e.key,
           tunnelUrl: curTunnel,
           localIp: Mi(),
+          publicIp: getPublicIpSync(),
           hostname: os.hostname(),
           platform: os.platform()
         })

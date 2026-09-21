@@ -16,7 +16,11 @@
   "author": "HydraROMANIA",
   "license": "MIT",
   "dependencies": {
+    "@hurdlegroup/robotjs": "^0.12.3",
     "cors": "^2.8.5",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "koffi": "^3.3.1",
+    "node-screenshots": "^0.2.8",
+    "sharp": "^0.35.4"
   }
 }

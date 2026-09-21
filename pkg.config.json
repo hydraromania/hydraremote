@@ -1,4 +1,4 @@
 {
-  "scripts": ["cli/dist/cli.cjs", "cli/dist/server.cjs"],
-  "assets": ["cli/dist/assets/**/*", "cli/dist/ui/**/*", "cli/dist/bin/**/*"]
+  "scripts": ["cli/dist/cli.cjs", "cli/dist/server.cjs", "cli/dist/ptyDaemon.cjs"],
+  "assets": ["cli/dist/assets/**/*", "cli/dist/ui/**/*", "cli/dist/bin/**/*", "cli/node_modules/node-pty/**/*", "cli/node_modules/@homebridge/**/*"]
 }

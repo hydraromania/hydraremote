@@ -1,4 +1,4 @@
-// Desktop bridge daemon (runs as Local System). Named pipe server "9remote-desktop".
+// Desktop bridge daemon (runs as Local System). Named pipe server "hydraremote-desktop".
 // Protocol (line-based ASCII):
 //   STATE          -> "DESKTOP <name>"  (name == "Winlogon" when on the login screen)
 //   TYPE <text>    -> clears the field, types text via SendInput + VkKeyScanW, Enter; replies "OK"
@@ -28,7 +28,7 @@ class DesktopBridge {
   const ushort VK_BACK = 0x08;
   const ushort VK_RETURN = 0x0D;
   const ushort VK_SHIFT = 0x10;
-  const string PIPE = "9remote-desktop";
+  const string PIPE = "hydraremote-desktop";
   // Bump on every change to this file. The agent reads the same constant out of
   // the shipped .cs and compares it against what the running worker reports, so
   // a stale worker is detected without relying on file mtimes. Same contract as
@@ -36,7 +36,7 @@ class DesktopBridge {
   const string VERSION = "2";
   // Global\ (not Local\): the boot task runs in session 0 while a user-triggered
   // launcher runs in the console session — a per-session mutex would not see across them.
-  const string MUTEX_NAME = "Global\\9remote-desktop-bridge";
+  const string MUTEX_NAME = "Global\\hydraremote-desktop-bridge";
   // How long a starting worker waits for a shutting-down one to release the lock.
   const int HANDOFF_WAIT_MS = 10000;
 
